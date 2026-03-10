@@ -1,0 +1,53 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "מאגר שאלות — אוטומציה"
+  subtitle: "PLC · בקרה · ראייה ממוחשבת · ארדואינו"
+  author: ""
+  chapters:
+    - index.qmd
+    - part: "חלק א׳ — PLC ולוגיקה"
+      chapters:
+        - chapters/plc_intro.qmd
+        - chapters/plc_logic.qmd
+    - part: "חלק ב׳ — מודלים ובקרה"
+      chapters:
+        - chapters/models_2nd_order.qmd
+        - chapters/pid_control.qmd
+    - part: "חלק ג׳ — ראייה ממוחשבת"
+      chapters:
+        - chapters/cv_intro.qmd
+        - chapters/cv_processing.qmd
+    - part: "חלק ד׳ — ארדואינו, חיישנים ותקשורת"
+      chapters:
+        - chapters/arduino_intro.qmd
+        - chapters/sensors_stepper.qmd
+        - chapters/uart_rs232.qmd
+    - part: "נספח — אלגברה לינארית"
+      chapters:
+        - chapters/linalg_vectors.qmd
+        - chapters/linalg_matrices.qmd
+        - chapters/linalg_eigenvalues.qmd
+  sidebar:
+    logo: assets/logo.png
+    logo-alt: "מאגר שאלות אוטומציה"
+
+format:
+  html:
+    theme: default
+    toc: true
+    number-sections: true
+    df-print: paged
+    css:
+      - assets/styles.css
+      - assets/rtl-baseline.css
+    include-after-body:
+      - assets/auto-env-titles.html
+      - assets/chapter-numbering.html
+
+lang: he
+
+filters:
+  - assets/env-to-callout.lua
