@@ -7,23 +7,11 @@ book:
   author: ""
   chapters:
     - index.qmd
-    - part: "מודול 1 — PLC ולוגיקה"
-      chapters:
-        - chapters/plc_intro.qmd
-        - chapters/plc_logic.qmd
-    - part: "מודול 2 — מודלים רציפים ובקרה"
-      chapters:
-        - chapters/models_continuous.qmd
-        - chapters/pid_control.qmd
-    - part: "מודול 3 — חישה, חיישנים ומפעילים"
-      chapters:
-        - chapters/sensors_actuators.qmd
-    - part: "מודול 4 — ארדואינו"
-      chapters:
-        - chapters/arduino.qmd
-    - part: "מודול 5 — ראייה ממוחשבת"
-      chapters:
-        - chapters/cv.qmd
+    - chapters/plc.qmd
+    - chapters/models_control.qmd
+    - chapters/sensors_actuators.qmd
+    - chapters/arduino.qmd
+    - chapters/cv.qmd
   sidebar:
     logo: assets/logo.png
     logo-alt: "מאגר שאלות אוטומציה"
@@ -33,7 +21,7 @@ format:
     theme: default
     toc: true
     toc-title: "בפרק זה"
-    number-sections: true
+    number-sections: false
     df-print: paged
     css:
       - assets/rtl-baseline.css
@@ -41,7 +29,6 @@ format:
     include-in-header: assets/fonts.html
     include-after-body:
       - assets/auto-env-titles.html
-      - assets/chapter-numbering.html
 
 lang: he
 
