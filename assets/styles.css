@@ -1,96 +1,323 @@
-/* ===== עיצוב כללי לכל הסביבות ===== */
-.definition, .example, .exercise, .theorem, .lemma,
-.proposition, .corollary, .proof, .remark {
-  border: 1px solid var(--env-color, #999);
-  margin: 1.25em 0;
-  border-radius: 0;
+/* ═══════════════════════════════════════════════════
+   מאגר שאלות אוטומציה — עיצוב ראשי
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  --blue:      #1d3461;
+  --blue-mid:  #2952a3;
+  --blue-light:#e8eef8;
+  --orange:    #e85d04;
+  --orange-lt: #fff3ec;
+  --green:     #1a7f4b;
+  --green-lt:  #edfaf3;
+  --bg:        #f5f7fc;
+  --surface:   #ffffff;
+  --border:    #dde3ef;
+  --text:      #111827;
+  --muted:     #6b7280;
+  --radius:    12px;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,.06);
+  --shadow:    0 4px 18px rgba(0,0,0,.09);
+}
+
+/* ── בסיס ── */
+body {
+  font-family: 'Heebo', Arial, sans-serif;
+  font-size: 1.06rem;
+  line-height: 1.9;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ── כותרות ── */
+h1,h2,h3,h4 {
+  font-family: 'Assistant', 'Heebo', sans-serif;
+  color: var(--blue);
+  line-height: 1.3;
+}
+h1 {
+  font-size: 1.95rem;
+  font-weight: 800;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: .4rem;
+  margin-bottom: 1.5rem;
+}
+h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: .2rem;
+  margin-top: 2.4rem;
+  margin-bottom: 1rem;
+}
+h3 { font-size: 1.12rem; font-weight: 700; margin-top: 1.6rem; }
+
+/* ── אזור תוכן ── */
+#quarto-content main {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2.4rem 3rem;
+  margin: 1.2rem 0;
+  border: 1px solid var(--border);
+}
+
+/* ── סרגל צד ── */
+#quarto-sidebar { background: #eef1f9; border-left: 1px solid var(--border); }
+
+.sidebar-title {
+  font-family: 'Assistant', sans-serif;
+  font-weight: 800;
+  font-size: .95rem;
+  color: var(--blue);
+  padding: .9rem 1rem .5rem;
+  border-bottom: 2px solid var(--orange);
+  margin-bottom: .6rem;
+  letter-spacing: .01em;
+}
+
+.sidebar-item-text { font-size: .92rem; font-family: 'Heebo', sans-serif; }
+.sidebar-item-container .active > .sidebar-item-text { color: var(--orange); font-weight: 700; }
+.sidebar-item-container .sidebar-item-section > .sidebar-item-text {
+  color: var(--blue);
+  font-weight: 700;
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  opacity: .75;
+}
+
+/* ── TOC ── */
+#TOC { border-right: 3px solid var(--border); padding-right: 1rem; font-size: .87rem; }
+nav#TOC .active { color: var(--orange); font-weight: 600; }
+
+/* ── קוד ── */
+pre, code, .sourceCode {
+  direction: ltr !important;
+  text-align: left !important;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: .83rem;
+  line-height: 1.65;
+}
+pre {
+  background: #f1f3fb;
+  border: 1px solid var(--border);
+  border-right: 4px solid var(--blue-mid);
+  border-radius: var(--radius);
+  padding: 1rem 1.3rem;
+  overflow-x: auto;
+}
+code:not(pre code) {
+  background: #eef0fb;
+  color: #b03020;
+  padding: .12rem .38rem;
+  border-radius: 5px;
+  font-size: .86em;
+}
+
+/* ── טבלאות ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: .96rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+thead th {
+  background: var(--blue);
+  color: #fff;
+  padding: .65rem 1rem;
+  font-family: 'Assistant', sans-serif;
+  font-weight: 600;
+  font-size: .92rem;
+}
+tbody td { padding: .55rem 1rem; border-bottom: 1px solid var(--border); }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:nth-child(even) td { background: #f6f8ff; }
+tbody tr:hover td { background: #eef1ff; transition: background .14s; }
+
+/* ── תמונות ── */
+img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: var(--shadow-sm); display: block; margin: .8rem auto; }
+figure.quarto-figure, .figure { text-align: center !important; }
+figure.quarto-figure figcaption, .figure .figure-caption { text-align: center !important; color: var(--muted); font-size: .87rem; margin: .3rem auto; }
+
+/* ═══════════════════════════════════════════════════
+   סביבות שאלות ופתרונות
+   ═══════════════════════════════════════════════════ */
+
+.definition,.example,.exercise,.theorem,
+.lemma,.proposition,.corollary,.proof,.remark {
+  border: none;
+  border-right: 5px solid var(--env-color, #aaa);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 1.6em 0;
   overflow: hidden;
   direction: rtl;
+  background: color-mix(in srgb, var(--env-color, #ccc) 20%, white);
+  box-shadow: var(--shadow-sm);
 }
 
-/* ===== פס כותרת ===== */
-.definition .theorem-title,
-.example .theorem-title,
-.exercise .theorem-title,
-.theorem .theorem-title,
-.lemma .theorem-title,
-.proposition .theorem-title,
-.corollary .theorem-title,
-.proof .theorem-title,
+/* כותרת הסביבה */
+.definition .theorem-title,.example .theorem-title,
+.exercise .theorem-title,.theorem .theorem-title,
+.lemma .theorem-title,.proposition .theorem-title,
+.corollary .theorem-title,.proof .theorem-title,
 .remark .theorem-title {
   display: block;
-  background-color: var(--env-color, #999);
-  color: black; /* כותרת בשחור */
-  font-weight: bold;
-  font-size: 0.9rem; /* פונט טיפה קטן יותר */
-  padding: 0.35rem 0.6rem; /* פס פחות עבה */
+  background: var(--env-color, #aaa);
+  color: #111;
+  font-family: 'Assistant', sans-serif;
+  font-weight: 700;
+  font-size: .91rem;
+  padding: .42rem .9rem;
   margin: 0;
+  letter-spacing: .02em;
 }
 
-/* ===== גוף הסביבה ===== */
-.definition > :not(.theorem-title),
-.example > :not(.theorem-title),
-.exercise > :not(.theorem-title),
-.theorem > :not(.theorem-title),
-.lemma > :not(.theorem-title),
-.proposition > :not(.theorem-title),
-.corollary > :not(.theorem-title),
-.proof > :not(.theorem-title),
-.remark > :not(.theorem-title) {
-  padding: 0.6rem;
-  margin: 0;
-}
+/* גוף */
+.definition > :not(.theorem-title),.example > :not(.theorem-title),
+.exercise > :not(.theorem-title),.theorem > :not(.theorem-title),
+.lemma > :not(.theorem-title),.proposition > :not(.theorem-title),
+.corollary > :not(.theorem-title),.proof > :not(.theorem-title),
+.remark > :not(.theorem-title) { padding: .85rem 1.1rem; margin: 0; }
 
-/* ===== משוואות - LTR ===== */
-.definition .math.inline, .definition .math.display,
-.example .math.inline, .example .math.display,
-.exercise .math.inline, .exercise .math.display,
-.theorem .math.inline, .theorem .math.display,
-.lemma .math.inline, .lemma .math.display,
-.proposition .math.inline, .proposition .math.display,
-.corollary .math.inline, .corollary .math.display,
-.proof .math.inline, .proof .math.display,
-.remark .math.inline, .remark .math.display {
-  direction: ltr;
-}
+/* LTR למשוואות */
+.exercise .math.inline,.exercise .math.display,
+.definition .math.inline,.definition .math.display,
+.example .math.inline,.example .math.display,
+.theorem .math.inline,.theorem .math.display,
+.proof .math.inline,.proof .math.display,
+.remark .math.inline,.remark .math.display { direction: ltr; }
 
-/* ===== צבעים פסטליים לכל סביבה ===== */
-.definition { --env-color: rgba(255, 99, 71, 0.4); }     /* אדום פסטלי */
-.example   { --env-color: rgba(138, 43, 226, 0.3); }    /* סגול פסטלי */
-.exercise  { --env-color: rgba(30, 144, 255, 0.35); }   /* כחול פסטלי */
-.remark    { --env-color: rgba(0, 0, 0, 0.15); }   /* ירוק פסטלי */
-.theorem, .lemma, .proposition, .corollary { --env-color: rgba(255, 165, 0, 0.35); } /* שחור פסטלי */
-.proof     { --env-color: rgba(60, 179, 113, 0.35); }        /* שחור עוד יותר בהיר */
+/* צבעי סביבות */
+.exercise   { --env-color: rgba(29, 110, 219, 0.32); }
+.definition { --env-color: rgba(220, 80,  10, 0.30); }
+.example    { --env-color: rgba(128, 40, 220, 0.28); }
+.theorem,.lemma,.proposition,.corollary { --env-color: rgba(200,140,  0, 0.38); }
+.proof      { --env-color: rgba( 30,160, 90, 0.32); }
+.remark     { --env-color: rgba(  0,  0,  0, 0.11); }
 
-/* הסתרת כותרות-inline שמודבקות בתוך הפסקה הראשונה */
-.remark .remark-title,
-.proof  .proof-title { display: none; }
+.remark .remark-title, .proof .proof-title { display: none; }
 
-/* למרכז תמונות וכיתובים ב‑HTML של Quarto */
-figure.quarto-figure,
-.figure {
-  text-align: center !important;   /* עוקף את right מה‑RTL */
-}
-
-figure.quarto-figure figcaption,
-.figure .figure-caption {
-  text-align: center !important;
-  margin: 0.5rem auto;
-}
-
-/* רשימות בתוך סביבות: שהמספור יהיה בתוך התיבה ולא ייחתך */
-.definition ol, .definition ul,
-.example   ol, .example   ul,
-.exercise  ol, .exercise  ul,
-.theorem   ol, .theorem   ul,
-.lemma     ol, .lemma     ul,
-.proposition ol, .proposition ul,
-.corollary ol, .corollary ul,
-.remark    ol, .remark    ul,
-.proof     ol, .proof     ul {
-  list-style-position: inside;   /* המספר/תבליט בתוך הקופסה */
-  padding-inline-start: 0;       /* לא צריך ריווח שמאלה (או ימינה ב‑RTL) */
-  margin: 0.4rem 0;              /* ריווח אנכי נעים */
-  direction: rtl;                /* מוודא RTL גם ברשימה */
+/* רשימות בסביבות */
+.exercise ol,.exercise ul,.definition ol,.definition ul,
+.example ol,.example ul,.theorem ol,.theorem ul,
+.proof ol,.proof ul,.remark ol,.remark ul {
+  list-style-position: inside;
+  padding-inline-start: 0;
+  margin: .4rem 0;
+  direction: rtl;
   text-align: right;
+}
+
+/* ── כפתור הצג פתרון ── */
+.callout.callout-note {
+  border-right: 5px solid var(--green);
+  border-left: none;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--green-lt);
+  margin: .3rem 0 1.8rem;
+  box-shadow: var(--shadow-sm);
+}
+.callout.callout-note .callout-header {
+  background: rgba(26,127,75,.18);
+  color: #0e4d2b;
+  font-family: 'Assistant', sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
+  padding: .5rem 1rem;
+  transition: background .18s;
+}
+.callout.callout-note .callout-header:hover { background: rgba(26,127,75,.28); }
+.callout.callout-note .callout-body { padding: .9rem 1.2rem; direction: rtl; }
+
+/* רמז */
+.callout.callout-tip {
+  border-right: 5px solid #c48a00;
+  background: #fffaed;
+}
+.callout.callout-tip .callout-header { background: rgba(196,138,0,.18); color: #6b4800; font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════
+   דף הבית — כרטיסיות מודולים
+   ═══════════════════════════════════════════════════ */
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+  gap: 1.1rem;
+  margin: 2rem 0 2.5rem;
+}
+
+.module-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem 1.2rem 1.1rem;
+  text-align: right;
+  transition: transform .18s, border-color .18s, box-shadow .18s;
+  box-shadow: var(--shadow-sm);
+}
+.module-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--orange);
+  box-shadow: var(--shadow);
+}
+.module-card .mc-icon { font-size: 2.4rem; display: block; margin-bottom: .6rem; }
+.module-card .mc-num {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .09em; color: var(--orange); margin-bottom: .15rem;
+}
+.module-card h3 { font-size: .99rem; margin: 0 0 .35rem; color: var(--blue); border: none !important; }
+.module-card p  { font-size: .83rem; color: var(--muted); margin: 0; line-height: 1.5; }
+
+/* ── קופסת "איך מוסיפים" ── */
+.howto {
+  background: var(--blue-light);
+  border: 1px solid #c5d4ee;
+  border-right: 5px solid var(--blue);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1.2rem 1.5rem;
+  margin: 1.8rem 0;
+  direction: rtl;
+}
+.howto h4 { margin: 0 0 .7rem; color: var(--blue); font-size: 1rem; border: none; }
+.howto code { font-size: .81rem; }
+.howto ol { padding-inline-start: 1.2rem; }
+.howto li { margin: .3rem 0; font-size: .93rem; }
+
+/* ── הדגשה ב-landing ── */
+.intro-lead {
+  font-size: 1.12rem;
+  color: var(--blue);
+  line-height: 1.75;
+  border-right: 4px solid var(--orange);
+  padding-right: 1rem;
+  margin: 1.2rem 0 2rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   ריספונסיבי
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  #quarto-content main { padding: 1.5rem 1.4rem; }
+}
+
+@media (max-width: 768px) {
+  #quarto-content main { padding: 1.2rem 1rem; margin: .3rem; border-radius: 8px; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.18rem; margin-top: 1.8rem; }
+  .module-grid { grid-template-columns: 1fr 1fr; gap: .75rem; }
+  .module-card { padding: 1rem .9rem; }
+  .module-card .mc-icon { font-size: 1.8rem; }
+  table { font-size: .85rem; }
+  pre { font-size: .77rem; padding: .7rem .9rem; }
+}
+
+@media (max-width: 500px) {
+  .module-grid { grid-template-columns: 1fr; }
+  .module-card { display: flex; align-items: flex-start; gap: 1rem; }
+  .module-card .mc-icon { font-size: 1.9rem; margin: 0; flex-shrink: 0; }
 }

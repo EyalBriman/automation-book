@@ -4,32 +4,26 @@ project:
 
 book:
   title: "מאגר שאלות — אוטומציה"
-  subtitle: "PLC · בקרה · ראייה ממוחשבת · ארדואינו"
   author: ""
   chapters:
     - index.qmd
-    - part: "חלק א׳ — PLC ולוגיקה"
+    - part: "מודול 1 — PLC ולוגיקה"
       chapters:
         - chapters/plc_intro.qmd
         - chapters/plc_logic.qmd
-    - part: "חלק ב׳ — מודלים ובקרה"
+    - part: "מודול 2 — מודלים רציפים ובקרה"
       chapters:
-        - chapters/models_2nd_order.qmd
+        - chapters/models_continuous.qmd
         - chapters/pid_control.qmd
-    - part: "חלק ג׳ — ראייה ממוחשבת"
+    - part: "מודול 3 — חישה, חיישנים ומפעילים"
       chapters:
-        - chapters/cv_intro.qmd
-        - chapters/cv_processing.qmd
-    - part: "חלק ד׳ — ארדואינו, חיישנים ותקשורת"
+        - chapters/sensors_actuators.qmd
+    - part: "מודול 4 — ארדואינו"
       chapters:
-        - chapters/arduino_intro.qmd
-        - chapters/sensors_stepper.qmd
-        - chapters/uart_rs232.qmd
-    - part: "נספח — אלגברה לינארית"
+        - chapters/arduino.qmd
+    - part: "מודול 5 — ראייה ממוחשבת"
       chapters:
-        - chapters/linalg_vectors.qmd
-        - chapters/linalg_matrices.qmd
-        - chapters/linalg_eigenvalues.qmd
+        - chapters/cv.qmd
   sidebar:
     logo: assets/logo.png
     logo-alt: "מאגר שאלות אוטומציה"
@@ -38,11 +32,13 @@ format:
   html:
     theme: default
     toc: true
+    toc-title: "בפרק זה"
     number-sections: true
     df-print: paged
     css:
-      - assets/styles.css
       - assets/rtl-baseline.css
+      - assets/styles.css
+    include-in-header: assets/fonts.html
     include-after-body:
       - assets/auto-env-titles.html
       - assets/chapter-numbering.html
