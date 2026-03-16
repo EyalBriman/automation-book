@@ -1,4 +1,3 @@
--- env-to-callout.lua
 function Div(div)
   if not quarto.doc.isFormat("pdf") then
     if div.classes:includes("solution") then
