@@ -179,7 +179,7 @@ $$Y_0 = X_{10} \cdot \left(TC_0 \cdot \overline{TC_1} + TC_{246} \cdot X_1\right
 
 **ביטוי סופי לנורת אזהרה:**
 
-$$Y_1 = X_{10} \cdot \left(1 \text{ אם } CC_1 < CC_0,\ \text{אחרת } 0\right)$$
+$$Y_1 = X_{10} \cdot \left(1 \text{ if } CC_1 < CC_0,\ \text{else } 0\right)$$
 
 ---
 
