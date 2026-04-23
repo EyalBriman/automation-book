@@ -157,13 +157,26 @@ Output will be in the `docs/` folder (configured in `_quarto.yml`).
 
 ## 📄 License
 
-[Your License Here]
+This work is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+**This means you are free to:**
+- **Share** — copy and redistribute the material in any medium or format
+- **Adapt** — remix, transform, and build upon the material
+
+**Under the following terms:**
+- **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made
+- **NonCommercial** — You may not use the material for commercial purposes
+- **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the same license
+
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 ---
 
 ## 👥 Contributors
 
-[Your Name/Team]
+**Course Development Team:**
+- **Eyal Briman**
+- **Sigal Berman**
 
 ---
 
