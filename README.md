@@ -1,180 +1,176 @@
-# מאגר שאלות — קורס אוטומציה
+# Automation Course - Question Bank / מאגר שאלות לקורס אוטומציה
 
-ספר שאלות ופתרונות אינטראקטיבי. כל שאלה מלווה בכפתור **▸ הצג פתרון**.
+An interactive question and solution bank for an Automation and Integrated Systems course, built with [Quarto](https://quarto.org/).
 
----
-
-## קבצי המודולים
-
-| מודול | קובץ לעריכה |
-|-------|-------------|
-| PLC ולוגיקה | `chapters/plc.qmd` |
-| מודלים רציפים ובקרה | `chapters/models_control.qmd` |
-| חישה, חיישנים ומפעילים | `chapters/sensors_actuators.qmd` |
-| ארדואינו | `chapters/arduino.qmd` |
-| ראייה ממוחשבת | `chapters/cv.qmd` |
-
-פתחו את הקובץ המתאים בעורך טקסט (VS Code, Notepad++) ועקבו אחרי ההוראות.
+**Live Site:** [Your GitHub Pages URL]
 
 ---
 
-## ➕ הוספת שאלה
+## 📚 Course Structure
 
-העתיקו את הבלוק הבא לתוך הקובץ המתאים — **בכל מקום שתרצו**:
+The course covers 5 main topics:
+
+1. **PLC & Logic** (PLC ולוגיקה) - PLCs, Ladder Diagrams, Boolean logic, timers, and counters
+2. **Continuous Models & Control** (מודלים רציפים ובקרה) - Mechanical and electrical systems, transfer functions, PID controllers
+3. **Sensing, Sensors, Communication & Actuators** (חישה, חיישנים, תקשורת ומפעילים) - Sensor specifications, motors, UART, measurement errors
+4. **Arduino** (ארדואינו) - Arduino programming, PWM, sensors, libraries
+5. **Computer Vision** (ראייה ממוחשבת) - Code implementation, segmentation, filters, Hough transform
+
+---
+
+## ⭐ Difficulty Levels
+
+Questions in each topic are organized into three difficulty levels:
+
+- **★ Practice Level** (רמת תרגול) - Basic questions for understanding core concepts and initial practice
+- **★★ Medium Level** (רמת קושי בינונית) - More complex questions requiring integration of multiple concepts, suitable for exam preparation
+- **★★★ Exam Level** (רמת מבחן) - Exam-level questions requiring deep thinking and complete mastery of material
+
+---
+
+## 🗂️ Repository Structure
+
+```
+automation-book-main/
+├── index.qmd                    # Landing page (no navigation buttons)
+├── _quarto.yml                  # Quarto configuration
+├── README.md                    # This file
+├── chapters/                    # Question chapters by topic
+│   ├── plc.qmd                  # PLC & Logic (9 questions)
+│   ├── models_control.qmd       # Continuous Models & Control
+│   ├── sensors_actuators.qmd    # Sensing & Actuators
+│   ├── arduino.qmd              # Arduino
+│   └── cv.qmd                   # Computer Vision
+├── images/                      # Images organized by topic
+│   ├── PLC/                     # PLC ladder diagrams (19 images)
+│   ├── models_control/          # (Future)
+│   ├── sensors_actuators/       # (Future)
+│   ├── arduino/                 # (Future)
+│   └── cv/                      # (Future)
+└── assets/                      # Styles, fonts, filters
+    ├── styles.css
+    ├── rtl-baseline.css         # RTL support for Hebrew
+    ├── fonts.html
+    ├── auto-env-titles.html
+    └── env-to-callout.lua       # Quarto filter
+```
+
+---
+
+## 🧭 Navigation
+
+- **Landing page** (`index.qmd`) provides course overview and difficulty level explanations
+- **Sidebar navigation** (left side) is the only way to navigate between topics
+- No navigation buttons on the landing page - this is intentional to reduce confusion
+
+---
+
+## 📝 Question Format
+
+Each question follows this structure:
 
 ```markdown
 ::: {.exercise}
-כתבו כאן את השאלה.
-:::
+**שאלה X.Y: Question Title**
 
-::: {.solution}
-כתבו כאן את הפתרון המפורט.
-הכפתור "הצג פתרון" נוצר אוטומטית.
-:::
-```
+[Question content in Hebrew]
 
-> ⚠️ חובה להשאיר **שורה ריקה** לפני ואחרי כל `:::`.
-
----
-
-## ✏️ עריכת שאלה קיימת
-
-מצאו את הבלוק בקובץ ופשוט שנו את הטקסט בין `:::` הפותח לסוגר.
-
----
-
-## 🗑️ מחיקת שאלה
-
-מחקו את הבלוק **השלם** — מה-`:::` הראשון של השאלה עד ה-`:::` האחרון של הפתרון:
-
-```markdown
-::: {.exercise}      ← מחקו מכאן
+1. Sub-question 1
+2. Sub-question 2
 ...
 :::
 
-::: {.solution}
-...
-:::                  ← עד כאן (כולל)
-```
+::: {.callout-note collapse="true" title="▸ הצג פתרון"}
+[Solution content with step-by-step explanations]
 
----
+**Mathematical notation:** Uses LaTeX with $...$ for inline and $$...$$ for display
 
-## 📐 LaTeX — נוסחאות
-
-**בתוך שורה** — עם `$ ... $`:
-
-```markdown
-קבוע הזמן הוא $\tau = RC$.
-```
-
-**בשורה נפרדת** — עם `$$ ... $$`:
-
-```markdown
-$$
-G(s) = \frac{\omega_n^2}{s^2 + 2\zeta\omega_n s + \omega_n^2}
-$$
-```
-
-**דוגמה מלאה:**
-
-```markdown
-::: {.exercise}
-נתון $\omega_n = 5\,\text{rad/s}$ ו-$\zeta = 0.4$.
-חשבו את תנודת היתר:
-
-$$
-M_p = e^{-\pi\zeta / \sqrt{1-\zeta^2}} \times 100\%
-$$
-:::
-
-::: {.solution}
-נציב את הערכים:
-
-$$
-M_p = e^{-\pi \cdot 0.4 / \sqrt{1 - 0.16}} \times 100\% \approx 25.4\%
-$$
-:::
-```
-
-**קיצורי LaTeX שימושיים:**
-
-| מה רוצים | קוד |
-|----------|-----|
-| שבר | `\frac{a}{b}` |
-| כוח | `x^{2}` |
-| שורש | `\sqrt{x}` |
-| אינטגרל | `\int_0^T f(t)\,dt` |
-| סכום | `\sum_{i=1}^{n} x_i` |
-| גבול | `\lim_{s \to 0} G(s)` |
-| יחידות | `10\,\text{ms}` |
-| מטריצה | `\begin{pmatrix} a & b \\ c & d \end{pmatrix}` |
-| חצים | `\rightarrow` / `\Rightarrow` |
-| אינסוף | `\infty` |
-
----
-
-## 🖼️ תמונות
-
-**שלב 1** — שמרו את קובץ התמונה בתיקיית `images/`.
-
-פורמטים נתמכים: `.png` `.jpg` `.jpeg` `.svg`
-
-**שלב 2** — הפנו אליה בתוך השאלה או הפתרון:
-
-```markdown
-![כיתוב התמונה](../images/שם_הקובץ.png){width=70%}
-```
-
-שנו את `70%` לפי הצורך — `50%`, `80%`, `100%`.
-
-**דוגמה מלאה עם תמונה:**
-
-```markdown
-::: {.exercise}
-בהתאם לסכמה הבאה, חשבו את קבוע הזמן $\tau$:
-
-![סכמת מעגל RC](../images/rc_circuit.png){width=60%}
-:::
-
-::: {.solution}
-מהסכמה: $R = 1\,k\Omega$, $C = 10\,\mu F$, לכן:
-
-$$\tau = RC = 10\,\text{ms}$$
+**Images:** ![Description](../images/TOPIC/filename.png){width=X%}
 :::
 ```
 
 ---
 
-## 💡 הוספת רמז (אופציונלי)
+## 🚀 Building the Site
 
-```markdown
-::: {.hint}
-רמז קצר — יופיע כפתור "▸ רמז" מתחת לשאלה.
-:::
-```
+### Prerequisites
+- [Quarto](https://quarto.org/docs/get-started/) installed
 
----
-
-## 🚀 פרסום השינויים
-
-לאחר כל עריכה — הריצו בטרמינל:
-
-```bash
-git add .
-git commit -m "תיאור קצר"
-git push
-```
-
-האתר מתעדכן אוטומטית תוך **1–2 דקות**.
-
----
-
-## 🛠️ תצוגה מקומית (אופציונלי)
-
-אם מותקן Quarto במחשב:
-
+### Local Preview
 ```bash
 quarto preview
 ```
 
-הספר נפתח בדפדפן עם רענון חי בכל שמירה.
+### Build Static Site
+```bash
+quarto render
+```
+
+Output will be in the `docs/` folder (configured in `_quarto.yml`).
+
+### Deploy to GitHub Pages
+1. Push to GitHub
+2. Go to repository Settings → Pages
+3. Set source to: Deploy from branch `main` → folder `/docs`
+4. Save
+
+---
+
+## ✏️ Adding New Questions
+
+### To add questions to existing topics:
+
+1. **Open the chapter file** (e.g., `chapters/plc.qmd`)
+2. **Choose the difficulty section** (★, ★★, or ★★★)
+3. **Add your question** using the format above
+4. **Add images** to `images/[TOPIC]/` folder
+5. **Update image references** in the question
+
+### To add a new topic:
+
+1. Create `chapters/new_topic.qmd`
+2. Add to `_quarto.yml` under `chapters:`
+3. Create `images/new_topic/` folder
+4. Follow the 3-level difficulty structure
+
+---
+
+## 🎨 Styling
+
+- **RTL Support:** Hebrew text is automatically rendered right-to-left
+- **Custom Styles:** Defined in `assets/styles.css`
+- **Collapsible Solutions:** Uses Quarto callout blocks with `collapse="true"`
+
+---
+
+## 📊 Current Progress
+
+| Topic | Questions | Images | Status |
+|-------|-----------|--------|--------|
+| PLC & Logic | 9 | 19 | ✅ Complete |
+| Models & Control | TBD | TBD | 🚧 In Progress |
+| Sensors & Actuators | TBD | TBD | 🚧 In Progress |
+| Arduino | TBD | TBD | 🚧 In Progress |
+| Computer Vision | TBD | TBD | 🚧 In Progress |
+
+---
+
+## 📄 License
+
+[Your License Here]
+
+---
+
+## 👥 Contributors
+
+[Your Name/Team]
+
+---
+
+## 🐛 Issues & Contributions
+
+Found a bug or want to contribute? [Open an issue](../../issues) or submit a pull request!
+
+---
+
+**Built with ❤️ using [Quarto](https://quarto.org/)**
