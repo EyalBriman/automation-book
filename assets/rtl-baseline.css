@@ -1,4 +1,0 @@
-html { direction: rtl; unicode-bidi: plaintext; }
-body { text-align: right; }
-.math.inline, .math.display { direction: ltr; unicode-bidi: embed; text-align: left; }
-.sidebar, .sidebar nav, .sidebar .sidebar-item, .sidebar .sidebar-header { text-align: right; }

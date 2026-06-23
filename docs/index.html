@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>תרגילים בקורס אוטומציה ומערכות משולבות</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script defer src="assets/book-data.js"></script>
+  <script defer src="assets/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">דלג לתוכן</a>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-title">אוטומציה ומערכות משולבות</div>
+        <div class="brand-subtitle">ספר תרגילים</div>
+      </div>
+      <nav id="book-nav" aria-label="ניווט בספר"></nav>
+    </aside>
+
+    <main class="main" id="main">
+      <header class="topbar">
+        <button class="menu-button" id="menu-button" type="button" aria-label="פתיחת תפריט">☰</button>
+        <div>
+          <h1>תרגילים בקורס אוטומציה ומערכות משולבות</h1>
+          <p>מאת איל ברימן, שי גבעתי, סיגל ברמן</p>
+        </div>
+      </header>
+
+      <section class="hero" id="landing">
+        <h2>תוכנית הספר</h2>
+        <p>
+          בפרק 1 מוצגות כל השאלות והפתרונות, ובפרק 2 מופיעות בינתיים שאלות 2.1.1 ו־2.1.2.
+          סעיפים שעדיין לא הושלמו מסומנים כבעבודה.
+        </p>
+        <div id="plan-grid" class="plan-grid"></div>
+      </section>
+
+      <section class="content-section" id="content">
+        <div class="section-heading">
+          <h2>פרק 1 מודלים ובקרה</h2>
+          <p>כל השאלות בפרק 1 מוצגות כאן. הפתרונות מוסתרים ונפתחים בלחיצה.</p>
+        </div>
+        <div class="toolbar">
+          <label for="section-filter">סינון לפי סעיף</label>
+          <select id="section-filter"></select>
+        </div>
+        <div id="exercise-list" class="exercise-list"></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
