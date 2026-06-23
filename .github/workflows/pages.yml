@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,19 +30,24 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Verify Word source exists
-        run: test -f source/Automation_book22June2026.docx
+        run: |
+          test -f source/Automation_book22June2026.docx
 
       - name: Build site from Word
-        run: python scripts/build-from-word-pandoc.py source/Automation_book22June2026.docx --out docs
+        run: |
+          python scripts/build-from-word-pandoc.py source/Automation_book22June2026.docx --out docs
 
       - name: Validate generated site
-        run: python scripts/validate-book.py --docs docs
+        run: |
+          python scripts/validate-book.py --docs docs
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -55,8 +61,10 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
     needs: build
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
