@@ -249,7 +249,7 @@ span[dir="rtl"] { direction: rtl; unicode-bidi: isolate; }
 }
 .ltr-inline {
   direction: ltr !important;
-  unicode-bidi: isolate !important;
+  unicode-bidi: isolate-override !important;
   display: inline-block;
   margin-inline: .08em;
   white-space: nowrap;
@@ -288,7 +288,9 @@ table .math.display {
   white-space: normal !important;
 }
 .ltr-inline {
-  display: inline;
+  display: inline-block;
+  direction: ltr !important;
+  unicode-bidi: isolate-override !important;
 }
 .parts-list {
   display: grid;
@@ -305,4 +307,17 @@ table .math.display {
   margin: 0 0 .75rem;
   color: var(--accent);
   font-size: 1.05rem;
+}
+
+
+/* v8 stricter bidi overrides */
+.ltr-inline, bdi[dir="ltr"] {
+  direction: ltr !important;
+  unicode-bidi: isolate-override !important;
+  display: inline-block !important;
+  white-space: nowrap;
+}
+.formula-line, .formula-line * {
+  direction: ltr !important;
+  unicode-bidi: isolate-override !important;
 }

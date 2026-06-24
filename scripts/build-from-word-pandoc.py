@@ -308,6 +308,73 @@ def promote_formula_lines(soup: BeautifulSoup) -> None:
             tag["class"] = sorted(classes)
 
 
+def merge_ltr_fragments(soup: BeautifulSoup) -> None:
+    """Repair common bidi splits created by Pandoc/Word.
+
+    Examples fixed:
+    * <span class="ltr-inline">M</span><sub>1</sub>  -> one LTR unit M₁
+    * <span class="ltr-inline">t</span><span dir="rtl">=3, בזמן</span>
+      -> one LTR unit t=3, followed by Hebrew text.
+    Keeping the full mathematical token inside one LTR isolate prevents visual
+    reversal such as ``1M`` or ``t→∞ בזמן``.
+    """
+    def is_ltr_span(tag: Tag) -> bool:
+        return isinstance(tag, Tag) and "ltr-inline" in tag.get("class", [])
+
+    def ltr_text(tag: Tag) -> str:
+        return tag.get_text("", strip=False)
+
+    for span in list(soup.find_all(class_="ltr-inline")):
+        # Move immediately following sub/sup into the same LTR isolate.
+        while isinstance(span.next_sibling, Tag) and span.next_sibling.name in {"sub", "sup"}:
+            span.append(span.next_sibling.extract())
+
+        # Merge simple operator suffixes that Pandoc leaves in the following RTL
+        # text node/span.  This handles t=3, y(0)=2, x_1, s→0, t→∞, etc.
+        made_change = True
+        while made_change:
+            made_change = False
+            nxt = span.next_sibling
+            target = None
+            if isinstance(nxt, NavigableString):
+                target = nxt
+                text = str(nxt)
+            elif isinstance(nxt, Tag) and nxt.name == "span" and nxt.get("dir") == "rtl":
+                # Only touch plain spans; do not flatten complex content.
+                if len(list(nxt.children)) == 1 and isinstance(next(iter(nxt.children), None), NavigableString):
+                    target = nxt
+                    text = nxt.get_text("", strip=False)
+                else:
+                    text = ""
+            else:
+                text = ""
+            if not target or not text:
+                continue
+
+            m = re.match(r"^(\s*(?:[_=<>≤≥+\-*/]\s*)?(?:\d+(?:\.\d+)?|[A-Za-z][A-Za-z0-9_]*(?:\([^א-ת\n]*?\))?|∞)|\s*→\s*(?:∞|0))(.*)$", text, flags=re.S)
+            if not m:
+                continue
+            prefix, rest = m.group(1), m.group(2)
+            # Avoid swallowing plain Hebrew after a number. Stop before comma/space
+            # followed by Hebrew text.
+            if HEBREW_RE.search(prefix):
+                continue
+            if not prefix.strip():
+                continue
+            span.append(NavigableString(prefix))
+            if isinstance(target, NavigableString):
+                target.replace_with(NavigableString(rest))
+            else:
+                target.string = rest
+            made_change = True
+
+    # If a sub/sup somehow remained immediately before an LTR span, move it in front.
+    for span in list(soup.find_all(class_="ltr-inline")):
+        prev = span.previous_sibling
+        if isinstance(prev, Tag) and prev.name in {"sub", "sup"}:
+            span.insert(0, prev.extract())
+
+
 def postprocess_soup(soup: BeautifulSoup) -> None:
     # Set safe RTL defaults on semantic text blocks.
     for tag in soup.find_all(RTL_TEXT_TAGS):
@@ -319,6 +386,7 @@ def postprocess_soup(soup: BeautifulSoup) -> None:
         classes.add("math")
         tag["class"] = sorted(classes)
     isolate_ltr_text(soup)
+    merge_ltr_fragments(soup)
     promote_formula_lines(soup)
 
 
@@ -513,8 +581,8 @@ def build_data(html_path: Path, temp_dir: Path, docs_dir: Path) -> dict:
 
     return {
         "source": "source/Automation_book22June2026.docx",
-        "build": "pandoc-html-rtl-v5",
-        "notes": "Chapter 1 plus 2.1.1 and 2.1.2. Exercise 1.7.1 is one review question with סעיפים א–ו, each with its own hidden solution. Formula-like plain-text paragraphs are forced LTR. 1.7.1 סעיף ד and 1.1.3 use hand-fixed diagram images because Pandoc breaks some Word drawings into text fragments.",
+        "build": "pandoc-html-rtl-v8",
+        "notes": "Chapter 1 plus 2.1.1 and 2.1.2. Exercise 1.7.1 is one review question with סעיפים א–ו, each with its own hidden solution. Formula-like plain-text paragraphs and inline variable tokens are forced LTR as complete units. 1.7.1 סעיף ד and 1.1.3 use hand-fixed diagram images because Pandoc breaks some Word drawings into text fragments.",
         "chapters": CHAPTERS,
         "exercises": exercises,
     }

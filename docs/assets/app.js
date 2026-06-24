@@ -87,6 +87,19 @@
     `;
   }
 
+
+  function fixBidiFragments(root) {
+    // Keep variable tokens with subscripts/superscripts together in one LTR unit.
+    root.querySelectorAll('.ltr-inline').forEach(span => {
+      span.setAttribute('dir', 'ltr');
+      span.style.direction = 'ltr';
+      span.style.unicodeBidi = 'isolate-override';
+      while (span.nextSibling && span.nextSibling.nodeType === 1 && ['SUB', 'SUP'].includes(span.nextSibling.nodeName)) {
+        span.appendChild(span.nextSibling);
+      }
+    });
+  }
+
   function renderExercises(filterValue = 'all') {
     const list = document.getElementById('exercise-list');
     list.innerHTML = '';
@@ -111,6 +124,7 @@
       `;
       list.appendChild(article);
     }
+    fixBidiFragments(list);
     if (window.MathJax && window.MathJax.typesetPromise) {
       window.MathJax.typesetPromise([list]).catch(() => {});
     }
