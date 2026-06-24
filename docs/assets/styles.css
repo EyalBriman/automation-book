@@ -321,3 +321,69 @@ table .math.display {
   direction: ltr !important;
   unicode-bidi: isolate-override !important;
 }
+
+/* v9 collapsible sidebar: reduce visual load by showing only the active branch. */
+.nav-chapter {
+  margin: 0 0 .45rem;
+  border-radius: .6rem;
+}
+.nav-chapter-title {
+  cursor: pointer;
+  list-style: none;
+  padding: .45rem .35rem;
+  border-radius: .55rem;
+}
+.nav-chapter-title::-webkit-details-marker { display: none; }
+.nav-chapter-title::before {
+  content: "▸";
+  display: inline-block;
+  margin-inline-end: .35rem;
+  transition: transform .15s ease;
+}
+.nav-chapter[open] > .nav-chapter-title::before { transform: rotate(-90deg); }
+.nav-chapter-title:hover,
+.nav-chapter-title:focus {
+  background: rgba(255,255,255,.10);
+  outline: none;
+}
+.nav-chapter-content { padding-inline-start: .35rem; }
+.nav-section-detail { margin: .1rem 0; }
+.nav-section {
+  cursor: pointer;
+  list-style: none;
+}
+.nav-section::-webkit-details-marker { display: none; }
+.nav-section::before {
+  content: "▸";
+  display: inline-block;
+  margin-inline-end: .28rem;
+  color: #93c5fd;
+  transition: transform .15s ease;
+}
+.nav-section-detail[open] > .nav-section::before { transform: rotate(-90deg); }
+.nav-section.active {
+  background: rgba(255,255,255,.16);
+  color: #ffffff;
+  font-weight: 700;
+}
+.nav-exercise-list {
+  margin: .2rem 0 .35rem;
+  padding-inline-start: .75rem;
+  border-inline-start: 1px solid rgba(191,219,254,.28);
+}
+.nav-exercise {
+  padding-inline-start: .45rem;
+  line-height: 1.45;
+}
+.nav-coming {
+  border-radius: .45rem;
+  margin: .12rem 0;
+}
+.section-marker h3 { margin-top: 0; }
+.exercise-part {
+  border-top: 1px solid var(--line);
+  padding-top: .75rem;
+  margin-top: 1rem;
+}
+.exercise-part:first-child { border-top: 0; }
+.exercise-part h4 { margin: .4rem 0 .6rem; color: var(--accent); }

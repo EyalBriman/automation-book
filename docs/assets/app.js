@@ -1,4 +1,20 @@
 (function () {
+  const state = {
+    section: null
+  };
+
+  function allExercises() {
+    return window.BOOK_DATA.exercises || [];
+  }
+
+  function implementedSections() {
+    return [...new Set(allExercises().map(e => e.section))];
+  }
+
+  function defaultSection() {
+    return implementedSections()[0] || 'all';
+  }
+
   function sectionTitle(id) {
     for (const chapter of window.BOOK_DATA.chapters) {
       for (const section of chapter.sections || []) {
@@ -6,6 +22,43 @@
       }
     }
     return id;
+  }
+
+  function chapterForSection(sectionId) {
+    for (const chapter of window.BOOK_DATA.chapters) {
+      for (const section of chapter.sections || []) {
+        if (section.id === sectionId) return chapter;
+      }
+    }
+    return null;
+  }
+
+  function sectionFromHash() {
+    const hash = decodeURIComponent(window.location.hash || '');
+    if (!hash) return null;
+    const sectionMatch = hash.match(/^#section-(\d+)-(\d+)$/);
+    if (sectionMatch) return `${sectionMatch[1]}.${sectionMatch[2]}`;
+    const exerciseMatch = hash.match(/^#ex-(.+)$/);
+    if (exerciseMatch) {
+      const ex = allExercises().find(item => item.id === exerciseMatch[1]);
+      if (ex) return ex.section;
+    }
+    return null;
+  }
+
+  function setCurrentSection(sectionId, options = {}) {
+    const available = implementedSections();
+    if (!sectionId || !available.includes(sectionId)) {
+      sectionId = defaultSection();
+    }
+    state.section = sectionId;
+    const select = document.getElementById('section-filter');
+    if (select) select.value = sectionId;
+    renderNav();
+    renderExercises(sectionId);
+    if (options.updateHash) {
+      history.pushState(null, '', `#section-${sectionId.replaceAll('.', '-')}`);
+    }
   }
 
   function renderPlan() {
@@ -27,36 +80,71 @@
   function renderNav() {
     const nav = document.getElementById('book-nav');
     nav.innerHTML = '';
+    const activeSection = state.section || defaultSection();
+    const activeChapter = chapterForSection(activeSection);
+
     for (const chapter of window.BOOK_DATA.chapters) {
-      const wrap = document.createElement('div');
-      wrap.className = 'nav-chapter';
-      wrap.innerHTML = `<div class="nav-chapter-title">פרק ${chapter.number} ${chapter.title}</div>`;
+      const chapterDetails = document.createElement('details');
+      chapterDetails.className = 'nav-chapter';
+      if (activeChapter && chapter.id === activeChapter.id) chapterDetails.open = true;
+
+      const chapterSummary = document.createElement('summary');
+      chapterSummary.className = 'nav-chapter-title';
+      chapterSummary.textContent = `פרק ${chapter.number} ${chapter.title}`;
+      chapterDetails.appendChild(chapterSummary);
+
+      const chapterContent = document.createElement('div');
+      chapterContent.className = 'nav-chapter-content';
+
       for (const section of chapter.sections || []) {
-        const sectionExercises = window.BOOK_DATA.exercises.filter(e => e.section === section.id);
-        const sectionLink = document.createElement(sectionExercises.length ? 'a' : 'div');
-        sectionLink.className = sectionExercises.length ? 'nav-section' : 'nav-coming';
-        sectionLink.textContent = `${section.id} ${section.title}` + (section.comingSoon ? ' · בעבודה' : '');
-        if (sectionExercises.length) sectionLink.href = `#section-${section.id.replaceAll('.', '-')}`;
-        wrap.appendChild(sectionLink);
-        for (const ex of sectionExercises) {
-          const a = document.createElement('a');
-          a.className = 'nav-exercise';
-          a.href = `#ex-${ex.id}`;
-          a.textContent = `${ex.number} ${ex.title}`;
-          wrap.appendChild(a);
+        const sectionExercises = allExercises().filter(e => e.section === section.id);
+        const hasExercises = sectionExercises.length > 0;
+        const isActive = section.id === activeSection;
+
+        if (!hasExercises) {
+          const div = document.createElement('div');
+          div.className = 'nav-coming';
+          div.textContent = `${section.id} ${section.title}${section.comingSoon ? ' · בעבודה' : ''}`;
+          chapterContent.appendChild(div);
+          continue;
         }
+
+        const sectionDetails = document.createElement('details');
+        sectionDetails.className = 'nav-section-detail';
+        if (isActive) sectionDetails.open = true;
+
+        const sectionSummary = document.createElement('summary');
+        sectionSummary.className = isActive ? 'nav-section active' : 'nav-section';
+        sectionSummary.dataset.section = section.id;
+        sectionSummary.textContent = `${section.id} ${section.title}`;
+        sectionDetails.appendChild(sectionSummary);
+
+        const exWrap = document.createElement('div');
+        exWrap.className = 'nav-exercise-list';
+        if (isActive) {
+          for (const ex of sectionExercises) {
+            const a = document.createElement('a');
+            a.className = 'nav-exercise';
+            a.href = `#ex-${ex.id}`;
+            a.textContent = `${ex.number} ${ex.title}`;
+            exWrap.appendChild(a);
+          }
+        }
+        sectionDetails.appendChild(exWrap);
+        chapterContent.appendChild(sectionDetails);
       }
-      nav.appendChild(wrap);
+
+      chapterDetails.appendChild(chapterContent);
+      nav.appendChild(chapterDetails);
     }
   }
 
   function renderFilter() {
     const select = document.getElementById('section-filter');
-    const sections = [...new Set(window.BOOK_DATA.exercises.map(e => e.section))];
-    select.innerHTML = '<option value="all">כל הסעיפים</option>' + sections.map(id => `<option value="${id}">${sectionTitle(id)}</option>`).join('');
-    select.addEventListener('change', () => renderExercises(select.value));
+    const sections = implementedSections();
+    select.innerHTML = sections.map(id => `<option value="${id}">${sectionTitle(id)}</option>`).join('');
+    select.addEventListener('change', () => setCurrentSection(select.value, { updateHash: true }));
   }
-
 
   function renderExerciseBody(ex) {
     if (Array.isArray(ex.parts) && ex.parts.length) {
@@ -87,7 +175,6 @@
     `;
   }
 
-
   function fixBidiFragments(root) {
     // Keep variable tokens with subscripts/superscripts together in one LTR unit.
     root.querySelectorAll('.ltr-inline').forEach(span => {
@@ -100,20 +187,23 @@
     });
   }
 
-  function renderExercises(filterValue = 'all') {
+  function renderExercises(sectionId = state.section || defaultSection()) {
     const list = document.getElementById('exercise-list');
+    const title = document.getElementById('content-title');
+    const intro = document.getElementById('content-intro');
     list.innerHTML = '';
-    const exercises = window.BOOK_DATA.exercises.filter(e => filterValue === 'all' || e.section === filterValue);
-    let currentSection = null;
+
+    const exercises = allExercises().filter(e => e.section === sectionId);
+    title.textContent = sectionTitle(sectionId);
+    intro.textContent = 'מוצגות כאן רק השאלות של הסעיף הנבחר. אפשר לעבור לסעיפים אחרים דרך התפריט הצדדי או דרך הסינון.';
+
+    const marker = document.createElement('div');
+    marker.id = `section-${sectionId.replaceAll('.', '-')}`;
+    marker.className = 'section-marker';
+    marker.innerHTML = `<h3>${sectionTitle(sectionId)}</h3>`;
+    list.appendChild(marker);
+
     for (const ex of exercises) {
-      if (ex.section !== currentSection) {
-        currentSection = ex.section;
-        const marker = document.createElement('div');
-        marker.id = `section-${ex.section.replaceAll('.', '-')}`;
-        marker.className = 'section-marker';
-        marker.innerHTML = `<h3>${sectionTitle(ex.section)}</h3>`;
-        list.appendChild(marker);
-      }
       const article = document.createElement('article');
       article.className = 'exercise-card';
       article.id = `ex-${ex.id}`;
@@ -124,6 +214,7 @@
       `;
       list.appendChild(article);
     }
+
     fixBidiFragments(list);
     if (window.MathJax && window.MathJax.typesetPromise) {
       window.MathJax.typesetPromise([list]).catch(() => {});
@@ -134,15 +225,28 @@
     const button = document.getElementById('menu-button');
     button.addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
     document.getElementById('book-nav').addEventListener('click', event => {
-      if (event.target.closest('a')) document.body.classList.remove('sidebar-open');
+      const sectionSummary = event.target.closest('summary.nav-section');
+      if (sectionSummary && sectionSummary.dataset.section) {
+        event.preventDefault();
+        setCurrentSection(sectionSummary.dataset.section, { updateHash: true });
+        if (window.matchMedia('(max-width: 900px)').matches) document.body.classList.remove('sidebar-open');
+        return;
+      }
+      if (event.target.closest('a.nav-exercise')) {
+        if (window.matchMedia('(max-width: 900px)').matches) document.body.classList.remove('sidebar-open');
+      }
     });
   }
 
+  window.addEventListener('hashchange', () => {
+    const section = sectionFromHash();
+    if (section && section !== state.section) setCurrentSection(section);
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     renderPlan();
-    renderNav();
     renderFilter();
-    renderExercises();
+    setCurrentSection(sectionFromHash() || defaultSection());
     setupMenu();
   });
 }());
