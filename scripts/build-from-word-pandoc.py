@@ -45,6 +45,7 @@ class ExerciseSpec:
     solution_start: Optional[int] = None
     solution_marker: bool = True
     visual: Optional[str] = None
+    additional_visuals: Sequence[str] = ()
 
 
 @dataclass(frozen=True)
@@ -75,9 +76,10 @@ class WordVisualSpec:
     paragraphs: Sequence[int]
     alt: str
     body_elements: Sequence[int] = ()
+    replace_table_index: Optional[int] = None
 
 
-# Explicit semantic map for Automation_book16July2026_1_updated(1).docx. The Word file does
+# Explicit semantic map for Automation_book23July2026.docx. The Word file does
 # not use heading styles consistently, so stable top-level Pandoc block boundaries
 # are used for text. Multi-part exam questions remain one card with one <details>
 # solution per סעיף.
@@ -120,106 +122,187 @@ EXERCISES: List[ExerciseSpec] = [
     ExerciseSpec("1.6.2ב", "1.6", "בקר PD בריסון קריטי", 866, 899, solution_start=876),
     ExerciseSpec("1.6.3", "1.6", "בקר PI", 900, 939, solution_start=911),
 
-    ExerciseSpec("1.7.4", "1.7", "בקרת מהירות לרכב", 1126, 1166, solution_start=1130, visual="1-7-4"),
+    ExerciseSpec("1.7.4", "1.7", "בקרת מהירות לרכב", 1131, 1171, solution_start=1135, visual="1-7-4"),
 
-    ExerciseSpec("2.1.1", "2.1", "בקר השקייה", 1212, 1229, solution_start=1214, visual="2-1-1-karnaugh"),
-    ExerciseSpec("2.1.2", "2.1", "בקר למקרר תעשייתי", 1229, 1245, solution_start=1232, visual="2-1-2-karnaugh"),
+    # Chapter 2. The reactor example is numbered 2.2.1 in the Word source and
+    # is placed before the two logic exercises; it is grouped under section 2.2
+    # here so exercise identifiers remain unique and the chapter navigation is coherent.
+    ExerciseSpec(
+        "2.2.1",
+        "2.2",
+        "בקרת ראקטור – מוני זמן",
+        1219,
+        1236,
+        solution_start=1220,
+        solution_marker=False,
+        visual="2-2-1-fill-karnaugh",
+        additional_visuals=("2-2-1-drain-karnaugh", "2-2-1-light-karnaugh"),
+    ),
+    ExerciseSpec("2.1.1", "2.1", "בקר השקייה", 1236, 1251, solution_start=1238, visual="2-1-1-karnaugh"),
+    ExerciseSpec("2.1.2", "2.1", "בקר למקרר תעשייתי", 1251, 1265, solution_start=1254, visual="2-1-2-karnaugh"),
+    ExerciseSpec("2.2.2", "2.2", "הפעלת חניון – מוני זמן", 1266, 1283, solution_start=1268, visual="2-2-2-karnaugh"),
+    ExerciseSpec("2.2.3", "2.2", "מערכת האכלת כלב – רגיסטרים", 1284, 1311, solution_start=1286, visual="2-2-3-karnaugh"),
+    ExerciseSpec("2.2.4", "2.2", "מערכת בקרת אקלים – רגיסטרים", 1312, 1335, solution_start=1314),
 
-    ExerciseSpec("4.1.1", "4.1", "שגיאה מוחלטת ושגיאה יחסית", 1251, 1270, solution_start=1257),
-    ExerciseSpec("4.1.2", "4.1", "ממוצע מדידות וחזרתיות", 1270, 1287, solution_start=1276),
-    ExerciseSpec("4.1.3", "4.1", "מערכת מדידה עם המרה ליניארית", 1287, 1306, solution_start=1294),
-    ExerciseSpec("4.2.1", "4.2", "תחום, טווח ו־FSD", 1307, 1328, solution_start=1315),
-    ExerciseSpec("4.2.2", "4.2", "רזולוציה של חיישן", 1328, 1349, solution_start=1338),
-    ExerciseSpec("4.2.3", "4.2", "לינאריות ושגיאת אי־לינאריות", 1349, 1380, solution_start=1359),
-    ExerciseSpec("4.3.1", "4.3", "רזולוציית ממיר A/D", 1381, 1389, solution_start=1384),
-    ExerciseSpec("4.3.2", "4.3", "קצב דגימה מינימלי", 1389, 1398, solution_start=1392),
-    ExerciseSpec("4.3.3", "4.3", "כמות דגימות", 1398, 1407, solution_start=1401),
-    ExerciseSpec("4.4.1", "4.4", "תיקון Offset", 1408, 1430, solution_start=1417),
-    ExerciseSpec("4.4.2", "4.4", "מציאת קבוע כיול", 1430, 1449, solution_start=1439),
-    ExerciseSpec("4.4.3", "4.4", "עקומת כיול ליניארית", 1449, 1477, solution_start=1459),
-    ExerciseSpec("4.5.1", "4.5", "PWM ומתח ממוצע", 1478, 1487, solution_start=1482),
-    ExerciseSpec("4.5.2", "4.5", "מהירות מנוע כתלות ב־PWM", 1487, 1500, solution_start=1492),
-    ExerciseSpec("4.5.3", "4.5", "מומנט נדרש להרמת עומס", 1500, 1514, solution_start=1506),
-    ExerciseSpec("4.6.1", "4.6", "הספק מכני של מנוע", 1515, 1525, solution_start=1518),
-    ExerciseSpec("4.6.2", "4.6", "מנוע Stepper ותנועה קווית", 1525, 1534, solution_start=1529),
-    ExerciseSpec("4.6.3", "4.6", "מנוע סרוו וזווית פקודה", 1534, 1552, solution_start=1541),
-    ExerciseSpec("4.7.1", "4.7", "רזולוציה של אנקודר אינקרמנטלי", 1553, 1563, solution_start=1557),
-    ExerciseSpec("4.7.2", "4.7", "אנקודר קוואדרטי", 1563, 1576, solution_start=1567),
-    ExerciseSpec("4.7.3", "4.7", "מרחק נסיעה לפי ספירות אנקודר", 1576, 1593, solution_start=1581),
+    # Chapter 3. The Word numbering restarts inside section 3.1; the website
+    # continues the sequence so every public exercise has a stable unique id.
+    ExerciseSpec("3.1.1", "3.1", "תמונת VALUE ומסנן חידוד", 1336, 1346, solution_start=1343),
+    ExerciseSpec("3.1.2", "3.1", "סגמנטציה ידנית בעזרת K-means", 1346, 1350, solution_start=1349),
+    ExerciseSpec("3.1.3", "3.1", "תמונת רמות אפור והמרה לשחור־לבן", 1350, 1379, solution_start=1367),
+    ExerciseSpec("3.1.4", "3.1", "מלבן, מרכז כובד ומורפולוגיה", 1379, 1401, solution_start=1387),
+    ExerciseSpec("3.1.5", "3.1", "סף, מרכז כובד ומסנן קצוות", 1401, 1427, solution_start=1406),
+    ExerciseSpec("3.2.1", "3.2", "סגמנטציה בעזרת K-means", 1427, 1444, solution_start=1431),
+    ExerciseSpec("3.2.2", "3.2", "סגמנטציית קוביות בעזרת K-means", 1444, 1462, solution_start=1452),
+
+    ExerciseSpec("4.1.1", "4.1", "שגיאה מוחלטת ושגיאה יחסית", 1464, 1483, solution_start=1470),
+    ExerciseSpec("4.1.2", "4.1", "ממוצע מדידות וחזרתיות", 1483, 1500, solution_start=1489),
+    ExerciseSpec("4.1.3", "4.1", "מערכת מדידה עם המרה ליניארית", 1500, 1519, solution_start=1507),
+    ExerciseSpec("4.2.1", "4.2", "תחום, טווח ו־FSD", 1520, 1541, solution_start=1528),
+    ExerciseSpec("4.2.2", "4.2", "רזולוציה של חיישן", 1541, 1562, solution_start=1551),
+    ExerciseSpec("4.2.3", "4.2", "לינאריות ושגיאת אי־לינאריות", 1562, 1593, solution_start=1572),
+    ExerciseSpec("4.3.1", "4.3", "רזולוציית ממיר A/D", 1594, 1602, solution_start=1597),
+    ExerciseSpec("4.3.2", "4.3", "קצב דגימה מינימלי", 1602, 1611, solution_start=1605),
+    ExerciseSpec("4.3.3", "4.3", "כמות דגימות", 1611, 1620, solution_start=1614),
+    ExerciseSpec("4.4.1", "4.4", "תיקון Offset", 1621, 1643, solution_start=1630),
+    ExerciseSpec("4.4.2", "4.4", "מציאת קבוע כיול", 1643, 1662, solution_start=1652),
+    ExerciseSpec("4.4.3", "4.4", "עקומת כיול ליניארית", 1662, 1690, solution_start=1672),
+    ExerciseSpec("4.5.1", "4.5", "PWM ומתח ממוצע", 1691, 1700, solution_start=1695),
+    ExerciseSpec("4.5.2", "4.5", "מהירות מנוע כתלות ב־PWM", 1700, 1713, solution_start=1705),
+    ExerciseSpec("4.5.3", "4.5", "מומנט נדרש להרמת עומס", 1713, 1727, solution_start=1719),
+    ExerciseSpec("4.6.1", "4.6", "הספק מכני של מנוע", 1728, 1738, solution_start=1731),
+    ExerciseSpec("4.6.2", "4.6", "מנוע Stepper ותנועה קווית", 1738, 1747, solution_start=1742),
+    ExerciseSpec("4.6.3", "4.6", "מנוע סרוו וזווית פקודה", 1747, 1765, solution_start=1754),
+    ExerciseSpec("4.7.1", "4.7", "רזולוציה של אנקודר אינקרמנטלי", 1766, 1776, solution_start=1770),
+    ExerciseSpec("4.7.2", "4.7", "אנקודר קוואדרטי", 1776, 1789, solution_start=1780),
+    ExerciseSpec("4.7.3", "4.7", "מרחק נסיעה לפי ספירות אנקודר", 1789, 1806, solution_start=1794),
 ]
 
 GROUPED_EXERCISES: List[GroupedExerciseSpec] = [
-    GroupedExerciseSpec("1.7.1", "1.7", "מועד א׳ 2026 סמסטר א", 940, 943, [
-        PartSpec("א", "פיזיקליות ויציבות", 943, 962, solution_start=945),
-        PartSpec("ב", "ערכי מצב מתמיד", 962, 980, solution_start=966),
-        PartSpec("ג", "מרחב מצבים", 980, 987, solution_start=981, solution_marker=False),
-        PartSpec("ד", "דיאגרמת חוג סגור", 987, 989, solution_start=988, visual="1-7-1-d"),
-        PartSpec("ה", "תמסורות חוג פתוח וסגור", 989, 997, solution_start=990, solution_marker=False),
-        PartSpec("ו", "מוצאי חוג פתוח וסגור", 997, 1013, solution_start=1001),
+    GroupedExerciseSpec("1.7.1", "1.7", "מועד א׳ 2026 סמסטר א", 944, 948, [
+        PartSpec("א", "פיזיקליות ויציבות", 948, 967, solution_start=950),
+        PartSpec("ב", "ערכי מצב מתמיד", 967, 985, solution_start=971),
+        PartSpec("ג", "מרחב מצבים", 985, 991, solution_start=986, solution_marker=False),
+        PartSpec("ד", "דיאגרמת חוג סגור", 991, 994, solution_start=993, visual="1-7-1-d"),
+        PartSpec("ה", "תמסורות חוג פתוח וסגור", 994, 1002, solution_start=995, solution_marker=False),
+        PartSpec("ו", "מוצאי חוג פתוח וסגור", 1002, 1018, solution_start=1006),
     ]),
-    GroupedExerciseSpec("1.7.2", "1.7", "מועד א׳ 2025 סמסטר ב", 1014, 1016, [
-        PartSpec("א", "מודל מרחב המצבים", 1016, 1022, solution_start=1017),
-        PartSpec("ב", "פיזיקליות ויציבות", 1022, 1038, solution_start=1023),
-        PartSpec("ג", "ערך מצב מתמיד", 1038, 1041, solution_start=1039),
-        PartSpec("ד", "דיאגרמת חוג סגור", 1041, 1044, solution_start=1042, visual="1-7-2-d"),
-        PartSpec("ה", "תמסורת חוג סגור", 1044, 1051, solution_start=1045),
-        PartSpec("ו", "תחומי יציבות ופיזיקליות", 1051, 1063, solution_start=1054),
+    GroupedExerciseSpec("1.7.2", "1.7", "מועד א׳ 2025 סמסטר ב", 1018, 1021, [
+        PartSpec("א", "מודל מרחב המצבים", 1021, 1027, solution_start=1022),
+        PartSpec("ב", "פיזיקליות ויציבות", 1027, 1043, solution_start=1028),
+        PartSpec("ג", "ערך מצב מתמיד", 1043, 1046, solution_start=1044),
+        PartSpec("ד", "דיאגרמת חוג סגור", 1046, 1049, solution_start=1047, visual="1-7-2-d"),
+        PartSpec("ה", "תמסורת חוג סגור", 1049, 1056, solution_start=1050),
+        PartSpec("ו", "תחומי יציבות ופיזיקליות", 1056, 1068, solution_start=1059),
     ]),
-    GroupedExerciseSpec("1.7.3", "1.7", "מועד א׳ 2025 סמסטר א", 1064, 1067, [
-        PartSpec("א", "פיזיקליות ויציבות", 1067, 1103, solution_start=1068),
-        PartSpec("ב", "תמסורת חוג סגור", 1103, 1108, solution_start=1104, visual="1-7-3-b"),
-        PartSpec("ג", "תחום קבוע הבקרה", 1108, 1119, solution_start=1110),
-        PartSpec("ד", "ערכי מצב מתמיד", 1119, 1126, solution_start=1120),
+    GroupedExerciseSpec("1.7.3", "1.7", "מועד א׳ 2025 סמסטר א", 1068, 1072, [
+        PartSpec("א", "פיזיקליות ויציבות", 1072, 1107, solution_start=1073),
+        PartSpec("ב", "תמסורת חוג סגור", 1107, 1113, solution_start=1109, visual="1-7-3-b"),
+        PartSpec("ג", "תחום קבוע הבקרה", 1113, 1124, solution_start=1115),
+        PartSpec("ד", "ערכי מצב מתמיד", 1124, 1131, solution_start=1125),
     ]),
-    GroupedExerciseSpec("1.7.5", "1.7", "מועד א׳ 2024 סמסטר ב", 1167, 1169, [
-        PartSpec("א", "יציבות התהליך", 1169, 1176, solution_start=1171),
-        PartSpec("ב", "תגובה למדרגה", 1176, 1192, solution_start=1178),
-        PartSpec("ג", "דיאגרמת חוג סגור", 1192, 1194, solution_start=1193, solution_marker=False, visual="1-7-5-c"),
-        PartSpec("ד", "תמסורת חוג סגור", 1194, 1197, solution_start=1195),
-        PartSpec("ה", "תחום קבוע הבקרה", 1197, 1204, solution_start=1199),
-        PartSpec("ו", "ריסון קריטי", 1204, 1211, solution_start=1205, solution_marker=False),
+    GroupedExerciseSpec("1.7.5", "1.7", "מועד א׳ 2024 סמסטר ב", 1171, 1174, [
+        PartSpec("א", "יציבות התהליך", 1174, 1181, solution_start=1176),
+        PartSpec("ב", "תגובה למדרגה", 1181, 1197, solution_start=1183),
+        PartSpec("ג", "דיאגרמת חוג סגור", 1197, 1199, solution_start=1198, solution_marker=False, visual="1-7-5-c"),
+        PartSpec("ד", "תמסורת חוג סגור", 1199, 1202, solution_start=1200),
+        PartSpec("ה", "תחום קבוע הבקרה", 1202, 1209, solution_start=1204),
+        PartSpec("ו", "ריסון קריטי", 1209, 1215, solution_start=1211, solution_marker=False),
     ]),
-    GroupedExerciseSpec("5.1.1", "5.1", "מועד א׳ 2026 סמסטר א", 1732, 1734, [
-        PartSpec("א", "משתנה lastVal", 1734, 1737, solution_start=1735),
-        PartSpec("ב", "פעולת נורת ה־LED", 1737, 1740, solution_start=1738),
-        PartSpec("ג", "פיצול הטיפול בנורה", 1740, 1743, solution_start=1741),
-        PartSpec("ד", "חיבור הרכיבים", 1743, 1753, solution_start=1750),
+    GroupedExerciseSpec("5.1.1", "5.1", "מועד א׳ 2026 סמסטר א", 1944, 1947, [
+        PartSpec("א", "משתנה lastVal", 1947, 1950, solution_start=1948),
+        PartSpec("ב", "פעולת נורת ה־LED", 1950, 1953, solution_start=1951),
+        PartSpec("ג", "פיצול הטיפול בנורה", 1953, 1956, solution_start=1954),
+        PartSpec("ד", "חיבור הרכיבים", 1956, 1966, solution_start=1963),
     ]),
-    GroupedExerciseSpec("5.2.1", "5.2", "מועד א׳ 2025 סמסטר ב", 1754, 1758, [
-        PartSpec("א", "המערכת כחיישן", 1758, 1761, solution_start=1759, visual="5-2-a"),
-        PartSpec("ב", "פעולת הקוד", 1761, 1777, solution_start=1762),
-        PartSpec("ג", "חיבור הרכיבים", 1777, 1780, solution_start=1778, solution_marker=False),
+    GroupedExerciseSpec("5.2.1", "5.2", "מועד א׳ 2025 סמסטר ב", 1966, 1971, [
+        PartSpec("א", "המערכת כחיישן", 1971, 1974, solution_start=1972, visual="5-2-a"),
+        PartSpec("ב", "פעולת הקוד", 1974, 1990, solution_start=1975),
+        PartSpec("ג", "חיבור הרכיבים", 1990, 1993, solution_start=1991, solution_marker=False),
     ]),
-    GroupedExerciseSpec("5.3.1", "5.3", "מועד א׳ 2025 סמסטר א", 1781, 1783, [
-        PartSpec("א", "המערכת כחיישן", 1783, 1788, solution_start=1784),
-        PartSpec("ב", "פעולת הקוד ותיקונו", 1788, 1803, solution_start=1789),
-        PartSpec("ג", "חיבור הרכיבים", 1803, 1810, solution_start=1804, visual="5-3-c"),
+    GroupedExerciseSpec("5.3.1", "5.3", "מועד א׳ 2025 סמסטר א", 1993, 1996, [
+        PartSpec("א", "המערכת כחיישן", 1996, 2001, solution_start=1997),
+        PartSpec("ב", "פעולת הקוד ותיקונו", 2001, 2016, solution_start=2002),
+        PartSpec("ג", "חיבור הרכיבים", 2016, 2023, solution_start=2017, visual="5-3-c"),
     ]),
-    GroupedExerciseSpec("5.4.1", "5.4", "מועד א׳ 2024 סמסטר ב", 1811, 1813, [
-        PartSpec("א", "תיקון שגיאות בקוד", 1813, 1818, solution_start=1814),
-        PartSpec("ב", "פונקציית Ginput", 1818, 1824, solution_start=1819),
-        PartSpec("ג", "שינוי הגדרות הפינים", 1824, 1827, solution_start=1825),
+    GroupedExerciseSpec("5.4.1", "5.4", "מועד א׳ 2024 סמסטר ב", 2023, 2026, [
+        PartSpec("א", "תיקון שגיאות בקוד", 2026, 2031, solution_start=2027),
+        PartSpec("ב", "פונקציית Ginput", 2031, 2037, solution_start=2032),
+        PartSpec("ג", "שינוי הגדרות הפינים", 2037, 2040, solution_start=2038),
     ]),
-    GroupedExerciseSpec("5.5.1", "5.5", "מועד א׳ 2024 סמסטר א", 1828, 1830, [
-        PartSpec("א", "תפקיד הארדואינו", 1830, 1833, solution_start=1831),
-        PartSpec("ב", "פעולת הקוד", 1833, 1841, solution_start=1834),
-        PartSpec("ג", "חיבור הרכיבים", 1841, 1845, solution_start=1842, visual="5-5-c"),
+    GroupedExerciseSpec("5.5.1", "5.5", "מועד א׳ 2024 סמסטר א", 2040, 2043, [
+        PartSpec("א", "תפקיד הארדואינו", 2043, 2046, solution_start=2044),
+        PartSpec("ב", "פעולת הקוד", 2046, 2054, solution_start=2047),
+        PartSpec("ג", "חיבור הרכיבים", 2054, 2058, solution_start=2055, visual="5-5-c"),
     ]),
 ]
 
 
 WORD_VISUALS: List[WordVisualSpec] = [
-    WordVisualSpec("1-1-3-solution", "word-visual-1-1-3-solution.png", [57], "מעגל חשמלי עם סימון הזרמים עבור פתרון שאלה 1.1.3"),
-    WordVisualSpec("1-7-1-d", "word-visual-1-7-1-d.png", list(range(1118, 1123)), "דיאגרמת החוג הסגור עבור מועד א׳ 2026, סעיף ד"),
-    WordVisualSpec("1-7-2-d", "word-visual-1-7-2-d.png", list(range(1203, 1207)), "דיאגרמת החוג הסגור עבור מועד א׳ 2025 סמסטר ב, סעיף ד"),
-    WordVisualSpec("1-7-3-b", "word-visual-1-7-3-b.png", list(range(1296, 1300)), "דיאגרמת החוג הסגור עבור מועד א׳ 2025 סמסטר א, סעיף ב"),
-    WordVisualSpec("1-7-4", "word-visual-1-7-4.png", list(range(1372, 1376)), "דיאגרמת חוג סגור של מערכת בקרת מהירות לרכב"),
-    WordVisualSpec("1-7-5-c", "word-visual-1-7-5-c.png", list(range(1456, 1462)), "דיאגרמת החוג הסגור עבור מועד א׳ 2024 סמסטר ב, סעיף ג"),
-    WordVisualSpec("2-1-1-karnaugh", "word-visual-2-1-1-karnaugh.png", [], "מפת קרנו צבעונית עבור בקר ההשקיה", body_elements=[1524]),
-    WordVisualSpec("2-1-2-karnaugh", "word-visual-2-1-2-karnaugh.png", [], "מפת קרנו צבעונית עבור בקר המקרר התעשייתי", body_elements=[1557]),
-    WordVisualSpec("5-2-a", "word-visual-5-2-a.png", [2249, 2250], "שרשרת האותות של המערכת האולטרסונית"),
-    WordVisualSpec("5-3-c", "word-visual-5-3-c.png", list(range(2385, 2397)), "חיבור ארדואינו, מטריצת חיבורים, מיקרופון ונורות"),
-    WordVisualSpec("5-5-c", "word-visual-5-5-c.png", [2525, 2526, 2527], "חיבור ארדואינו למנורת שולחן ולכפתור קפיצי"),
+    WordVisualSpec("1-1-3-solution", "word-visual-1-1-3-solution.png", [63], "מעגל חשמלי עם סימון הזרמים עבור פתרון שאלה 1.1.3"),
+    WordVisualSpec("1-7-1-d", "word-visual-1-7-1-d.png", list(range(1124, 1129)), "דיאגרמת החוג הסגור עבור מועד א׳ 2026, סעיף ד"),
+    WordVisualSpec("1-7-2-d", "word-visual-1-7-2-d.png", list(range(1209, 1213)), "דיאגרמת החוג הסגור עבור מועד א׳ 2025 סמסטר ב, סעיף ד"),
+    WordVisualSpec("1-7-3-b", "word-visual-1-7-3-b.png", list(range(1302, 1306)), "דיאגרמת החוג הסגור עבור מועד א׳ 2025 סמסטר א, סעיף ב"),
+    WordVisualSpec("1-7-4", "word-visual-1-7-4.png", list(range(1378, 1382)), "דיאגרמת חוג סגור של מערכת בקרת מהירות לרכב"),
+    WordVisualSpec("1-7-5-c", "word-visual-1-7-5-c.png", [1462, 1463, 1464, 1465, 1467], "דיאגרמת החוג הסגור עבור מועד א׳ 2024 סמסטר ב, סעיף ג"),
+    WordVisualSpec(
+        "2-2-1-fill-karnaugh",
+        "word-visual-2-2-1-fill-karnaugh.png",
+        [],
+        "מפת קרנו צבעונית עבור מנוע המילוי בבקרת הראקטור",
+        body_elements=[1516],
+        replace_table_index=2,
+    ),
+    WordVisualSpec(
+        "2-2-1-drain-karnaugh",
+        "word-visual-2-2-1-drain-karnaugh.png",
+        [],
+        "מפת קרנו צבעונית עבור ניקוז הראקטור",
+        body_elements=[1523],
+        replace_table_index=4,
+    ),
+    WordVisualSpec(
+        "2-2-1-light-karnaugh",
+        "word-visual-2-2-1-light-karnaugh.png",
+        [],
+        "מפת קרנו צבעונית עבור נורת החיווי בבקרת הראקטור",
+        body_elements=[1533],
+        replace_table_index=6,
+    ),
+    WordVisualSpec(
+        "2-1-1-karnaugh",
+        "word-visual-2-1-1-karnaugh.png",
+        [],
+        "מפת קרנו צבעונית עבור בקר ההשקיה",
+        body_elements=[1561],
+        replace_table_index=2,
+    ),
+    WordVisualSpec(
+        "2-1-2-karnaugh",
+        "word-visual-2-1-2-karnaugh.png",
+        [],
+        "מפת קרנו צבעונית עבור בקר המקרר התעשייתי",
+        body_elements=[1591],
+        replace_table_index=2,
+    ),
+    WordVisualSpec(
+        "2-2-2-karnaugh",
+        "word-visual-2-2-2-karnaugh.png",
+        [],
+        "מפת קרנו צבעונית עבור מנוע שער החניון",
+        body_elements=[1621],
+        replace_table_index=2,
+    ),
+    WordVisualSpec(
+        "2-2-3-karnaugh",
+        "word-visual-2-2-3-karnaugh.png",
+        [],
+        "מפת קרנו צבעונית עבור פקד הברז במערכת האכלת הכלב",
+        body_elements=[1670],
+        replace_table_index=2,
+    ),
+    WordVisualSpec("5-2-a", "word-visual-5-2-a.png", [2609, 2610], "שרשרת האותות של המערכת האולטרסונית"),
+    WordVisualSpec("5-3-c", "word-visual-5-3-c.png", list(range(2745, 2757)), "חיבור ארדואינו, מטריצת חיבורים, מיקרופון ונורות"),
+    WordVisualSpec("5-5-c", "word-visual-5-5-c.png", [2885, 2887], "חיבור ארדואינו למנורת שולחן ולכפתור קפיצי"),
 ]
 
 CHAPTERS = [
@@ -244,8 +327,8 @@ CHAPTERS = [
         "title": "לוגיקה ובקרים מתוכנתים",
         "status": "partial",
         "sections": [
-            {"id": "2.1", "title": "לוגיקה", "implemented": ["2.1.1", "2.1.2"]},
-            {"id": "2.2", "title": "בקרים", "comingSoon": True},
+            {"id": "2.1", "title": "לוגיקה"},
+            {"id": "2.2", "title": "בקרים"},
             {"id": "2.3", "title": "שאלות חזרה", "comingSoon": True},
         ],
     },
@@ -253,13 +336,12 @@ CHAPTERS = [
         "id": "chapter-3",
         "number": "3",
         "title": "עיבוד תמונה",
-        "status": "skeleton",
+        "status": "partial",
         "sections": [
-            {"id": "3.1", "title": "ייצוג ואיחסון"},
-            {"id": "3.2", "title": "סינון"},
-            {"id": "3.3", "title": "סגמנטציה"},
-            {"id": "3.4", "title": "מאפיינים"},
-            {"id": "3.5", "title": "שאלות חזרה"},
+            {"id": "3.1", "title": "סינון"},
+            {"id": "3.2", "title": "סגמנטציה"},
+            {"id": "3.3", "title": "מאפיינים", "comingSoon": True},
+            {"id": "3.4", "title": "שאלות חזרה", "comingSoon": True},
         ],
     },
     {
@@ -822,37 +904,64 @@ def clean_raw_pandoc_html(raw: str) -> str:
 
 
 
-def attach_word_visual(solution_html: str, key: Optional[str], visuals: Dict[str, WordVisualSpec]) -> str:
-    if not key:
+def attach_word_visuals(
+    solution_html: str,
+    keys: Sequence[str],
+    visuals: Dict[str, WordVisualSpec],
+) -> str:
+    if not keys:
         return solution_html
-    visual = visuals.get(key)
-    if visual is None:
-        raise SystemExit(f"Unknown Word visual key: {key}")
+    selected: List[WordVisualSpec] = []
+    for key in keys:
+        visual = visuals.get(key)
+        if visual is None:
+            raise SystemExit(f"Unknown Word visual key: {key}")
+        selected.append(visual)
 
     soup = BeautifulSoup(solution_html, "html.parser")
-    # The generated image is the complete drawing canvas. Remove Pandoc's partial
-    # image fragments so the diagram is not duplicated or shown without connectors.
-    for image in list(soup.find_all("img")):
-        parent = image.parent
-        image.decompose()
-        if isinstance(parent, Tag) and not parent.get_text(strip=True) and not parent.find(["img", "table"]):
-            parent.decompose()
-    for note in list(soup.select(".source-note")):
-        note.decompose()
 
-    figure_html = (
-        '<figure class="word-diagram" dir="ltr">'
-        f'<img src="media/{visual.filename}" alt="{visual.alt}" loading="lazy" dir="ltr" />'
-        '</figure>'
+    # Replace drawing-over-table canvases from the last table backwards, keeping
+    # ordinary Word/Pandoc images elsewhere in the same solution.
+    table_visuals = sorted(
+        (visual for visual in selected if visual.replace_table_index is not None),
+        key=lambda visual: int(visual.replace_table_index or 0),
+        reverse=True,
     )
-    if key in {"2-1-1-karnaugh", "2-1-2-karnaugh"}:
+    for visual in table_visuals:
         tables = soup.find_all("table")
-        if not tables:
-            raise SystemExit(f"Could not locate the Karnaugh-map table for visual {key}.")
+        table_index = int(visual.replace_table_index or 0)
+        if table_index >= len(tables):
+            raise SystemExit(
+                f"Could not locate table {table_index} for generated visual {visual.key}; "
+                f"the solution contains {len(tables)} tables."
+            )
+        figure_html = (
+            '<figure class="word-diagram" dir="ltr">'
+            f'<img src="media/{visual.filename}" alt="{visual.alt}" loading="lazy" dir="ltr" />'
+            '</figure>'
+        )
         rendered_figure = BeautifulSoup(figure_html, "html.parser").find("figure")
-        tables[-1].replace_with(rendered_figure)
-        return str(soup).strip()
-    return (str(soup).strip() + "\n" + figure_html).strip()
+        tables[table_index].replace_with(rendered_figure)
+
+    append_visuals = [visual for visual in selected if visual.replace_table_index is None]
+    if append_visuals:
+        # An appended image is the complete drawing canvas. Remove Pandoc's
+        # partial fragments so connectors and labels are not duplicated.
+        for image in list(soup.find_all("img")):
+            parent = image.parent
+            image.decompose()
+            if isinstance(parent, Tag) and not parent.get_text(strip=True) and not parent.find(["img", "table"]):
+                parent.decompose()
+        for note in list(soup.select(".source-note")):
+            note.decompose()
+        for visual in append_visuals:
+            figure_html = (
+                '<figure class="word-diagram" dir="ltr">'
+                f'<img src="media/{visual.filename}" alt="{visual.alt}" loading="lazy" dir="ltr" />'
+                '</figure>'
+            )
+            soup.append(BeautifulSoup(figure_html, "html.parser"))
+    return str(soup).strip()
 
 
 def build_grouped_exercise(
@@ -873,7 +982,11 @@ def build_grouped_exercise(
             visual=part.visual,
         )
         question_html, solution_html = split_question_solution(children, part_spec)
-        solution_html = attach_word_visual(solution_html, part.visual, visuals)
+        solution_html = attach_word_visuals(
+            solution_html,
+            [part.visual] if part.visual else [],
+            visuals,
+        )
         if not question_html.strip():
             raise SystemExit(f"Empty question HTML for {spec.number} סעיף {part.label}")
         if not solution_html.strip():
@@ -929,7 +1042,8 @@ def build_data(
             exercises.append(build_grouped_exercise(children, spec, visuals))
             continue
         question_html, solution_html = split_question_solution(children, spec)
-        solution_html = attach_word_visual(solution_html, spec.visual, visuals)
+        visual_keys = ([spec.visual] if spec.visual else []) + list(spec.additional_visuals)
+        solution_html = attach_word_visuals(solution_html, visual_keys, visuals)
         if not question_html.strip():
             raise SystemExit(f"Empty question HTML for {spec.number}")
         exercises.append({
@@ -943,8 +1057,8 @@ def build_data(
 
     return {
         "source": "private Word source (not included in the public repository)",
-        "build": "pandoc-html-word-drawings-rtl-v11",
-        "notes": "Public July 2026 edition. Chapters 1 and 5, Chapter 4 sections 4.1–4.7, and Chapter 2 logic questions are included; Chapter 3 remains a skeleton. Multi-part questions use a separate collapsible solution for every part. Word drawing canvases are rendered and content-trimmed automatically; no manual crop boxes are used.",
+        "build": "pandoc-html-word-drawings-rtl-v12",
+        "notes": "Public 23 July 2026 edition. Chapters 1 and 5, Chapter 2 sections 2.1–2.2, Chapter 3 sections 3.1–3.2, and Chapter 4 sections 4.1–4.7 are included. Unpublished source material remains excluded. Multi-part exam questions use a separate collapsible solution for every part. Word drawing canvases are rendered and content-trimmed automatically; no manual crop boxes are used.",
         "chapters": CHAPTERS,
         "exercises": exercises,
     }

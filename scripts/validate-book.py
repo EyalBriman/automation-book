@@ -44,6 +44,9 @@ for section, count in [("1.1", 4), ("1.2", 4), ("1.3", 4), ("1.4", 8), ("1.5", 7
 expected.update({"1.6.1א", "1.6.1ב", "1.6.2א", "1.6.2ב", "1.6.3"})
 expected.update(f"1.7.{i}" for i in range(1, 6))
 expected.update({"2.1.1", "2.1.2"})
+expected.update(f"2.2.{i}" for i in range(1, 5))
+expected.update(f"3.1.{i}" for i in range(1, 6))
+expected.update({"3.2.1", "3.2.2"})
 for section in range(1, 8):
     expected.update(f"4.{section}.{i}" for i in range(1, 4))
 expected.update(f"5.{section}.1" for section in range(1, 6))
@@ -55,8 +58,8 @@ if missing:
     errors.append("Missing exercises: " + ", ".join(missing))
 if extra:
     errors.append("Unexpected exercises: " + ", ".join(extra))
-if len(exercises) != 65:
-    errors.append(f"Expected 65 public exercises, found {len(exercises)}")
+if len(exercises) != 76:
+    errors.append(f"Expected 76 public exercises, found {len(exercises)}")
 
 ids = [exercise.get("id") for exercise in exercises]
 if len(ids) != len(set(ids)):
@@ -108,8 +111,12 @@ for exercise in exercises:
         errors.append(f"Empty solution: {number}")
 
 source_notes = [exercise.get("number") for exercise in exercises if "source-note" in exercise.get("solutionHtml", "")]
-if source_notes:
-    errors.append(f"Unexpected missing-source solution notes: {source_notes}")
+allowed_source_notes = {"3.1.2"}
+unexpected_source_notes = sorted(set(source_notes) - allowed_source_notes)
+if unexpected_source_notes:
+    errors.append(f"Unexpected missing-source solution notes: {unexpected_source_notes}")
+if set(source_notes) != allowed_source_notes:
+    errors.append(f"Expected a missing-source note only for 3.1.2, found: {source_notes}")
 
 irrigation = next((exercise for exercise in exercises if exercise.get("number") == "2.1.1"), None)
 if irrigation is None:
@@ -129,6 +136,11 @@ required_visuals = [
     "word-visual-1-7-5-c.png",
     "word-visual-2-1-1-karnaugh.png",
     "word-visual-2-1-2-karnaugh.png",
+    "word-visual-2-2-1-fill-karnaugh.png",
+    "word-visual-2-2-1-drain-karnaugh.png",
+    "word-visual-2-2-1-light-karnaugh.png",
+    "word-visual-2-2-2-karnaugh.png",
+    "word-visual-2-2-3-karnaugh.png",
     "word-visual-5-2-a.png",
     "word-visual-5-3-c.png",
     "word-visual-5-5-c.png",
@@ -150,7 +162,7 @@ if "word-drawings" not in data.get("build", ""):
     errors.append("Build metadata does not identify the Word-drawing renderer")
 
 chapter_status = {chapter.get("number"): chapter.get("status") for chapter in data.get("chapters", [])}
-if chapter_status != {"1": "implemented", "2": "partial", "3": "skeleton", "4": "implemented", "5": "implemented"}:
+if chapter_status != {"1": "implemented", "2": "partial", "3": "partial", "4": "implemented", "5": "implemented"}:
     errors.append(f"Wrong chapter statuses: {chapter_status}")
 
 if raw.count("word-code") < 5:
@@ -209,4 +221,4 @@ if errors:
     for error in errors:
         print(" -", error)
     sys.exit(1)
-print("Validation passed: 65 public exercises, the complete 2.1.1 solution, generated Word visuals, and publication-safety checks are complete.")
+print("Validation passed: 76 public exercises, generated Word visuals, and publication-safety checks are complete.")
