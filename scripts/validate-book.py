@@ -16,12 +16,20 @@ errors: list[str] = []
 
 
 def check_images(html: str, label: str) -> None:
-    for src in re.findall(r'<img[^>]+src="([^"]+)"', html):
+    for image_tag in re.findall(r"<img\b[^>]*>", html):
+        src_match = re.search(r'src="([^"]+)"', image_tag)
+        if not src_match:
+            errors.append(f"Image without src in {label}")
+            continue
+        src = src_match.group(1)
         path = root / src
         if not path.exists():
             errors.append(f"Missing image {src} in {label}")
         elif path.stat().st_size < 500:
             errors.append(f"Suspiciously small image {src} in {label}")
+        for required_attr in ['width="', 'height="', 'loading="eager"', 'decoding="sync"']:
+            if required_attr not in image_tag:
+                errors.append(f"Unstable image layout for {src} in {label}: missing {required_attr}")
 
 
 js_path = root / "assets" / "book-data.js"
@@ -45,7 +53,7 @@ expected.update({"1.6.1א", "1.6.1ב", "1.6.2א", "1.6.2ב", "1.6.3"})
 expected.update(f"1.7.{i}" for i in range(1, 6))
 expected.update({"2.1.1", "2.1.2"})
 expected.update(f"2.2.{i}" for i in range(1, 5))
-expected.update(f"3.1.{i}" for i in range(1, 6))
+expected.update(f"3.1.{i}" for i in range(1, 5))
 expected.update({"3.2.1", "3.2.2"})
 for section in range(1, 8):
     expected.update(f"4.{section}.{i}" for i in range(1, 4))
@@ -58,8 +66,8 @@ if missing:
     errors.append("Missing exercises: " + ", ".join(missing))
 if extra:
     errors.append("Unexpected exercises: " + ", ".join(extra))
-if len(exercises) != 76:
-    errors.append(f"Expected 76 public exercises, found {len(exercises)}")
+if len(exercises) != 75:
+    errors.append(f"Expected 75 public exercises, found {len(exercises)}")
 
 ids = [exercise.get("id") for exercise in exercises]
 if len(ids) != len(set(ids)):
@@ -111,12 +119,8 @@ for exercise in exercises:
         errors.append(f"Empty solution: {number}")
 
 source_notes = [exercise.get("number") for exercise in exercises if "source-note" in exercise.get("solutionHtml", "")]
-allowed_source_notes = {"3.1.2"}
-unexpected_source_notes = sorted(set(source_notes) - allowed_source_notes)
-if unexpected_source_notes:
-    errors.append(f"Unexpected missing-source solution notes: {unexpected_source_notes}")
-if set(source_notes) != allowed_source_notes:
-    errors.append(f"Expected a missing-source note only for 3.1.2, found: {source_notes}")
+if source_notes:
+    errors.append(f"Unexpected missing-source solution notes: {source_notes}")
 
 irrigation = next((exercise for exercise in exercises if exercise.get("number") == "2.1.1"), None)
 if irrigation is None:
@@ -194,7 +198,7 @@ if not index.exists():
     errors.append("Missing docs/index.html")
 else:
     html = index.read_text(encoding="utf-8")
-    for needle in ['dir="rtl"', "MathJax", "assets/book-data.js", "assets/app.js", "סעיפים 4.1–4.7"]:
+    for needle in ['dir="rtl"', "MathJax", "assets/book-data.js", "assets/app.js", "סעיפים 4.1–4.7", 'id="chapter-title"', 'id="content-title"']:
         if needle not in html:
             errors.append(f"Missing {needle} in docs/index.html")
 
@@ -203,7 +207,7 @@ if not app.exists():
     errors.append("Missing docs/assets/app.js")
 else:
     app_html = app.read_text(encoding="utf-8")
-    for needle in ["renderExerciseBody", "exercise-part", "solutionHtml"]:
+    for needle in ["renderExerciseBody", "exercise-part", "solutionHtml", "chapterTitle.textContent", '<h4 class="exercise-title">']:
         if needle not in app_html:
             errors.append(f"app.js is missing progressive-part support: {needle}")
 
@@ -221,4 +225,4 @@ if errors:
     for error in errors:
         print(" -", error)
     sys.exit(1)
-print("Validation passed: 76 public exercises, generated Word visuals, and publication-safety checks are complete.")
+print("Validation passed: 75 public exercises, fixed image dimensions, generated Word visuals, hierarchy, and publication-safety checks are complete.")

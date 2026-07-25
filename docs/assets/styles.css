@@ -121,6 +121,16 @@ body {
 }
 .hero, .content-section { padding: clamp(1rem, 3vw, 2rem); margin-bottom: 1.5rem; }
 .hero h2, .section-heading h2 { margin-top: 0; }
+.section-heading h2 {
+  color: var(--accent-dark);
+  font-size: clamp(1.45rem, 2.6vw, 2rem);
+  margin-bottom: .2rem;
+}
+.section-heading h3 {
+  color: var(--ink);
+  font-size: clamp(1.18rem, 2vw, 1.5rem);
+  margin: 0 0 .5rem;
+}
 .plan-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -339,7 +349,7 @@ table .math.display {
   padding: 1rem;
   background: #fffdf9;
 }
-.exercise-part h4 {
+.exercise-part h5 {
   margin: 0 0 .75rem;
   color: var(--accent);
   font-size: 1.05rem;
@@ -422,17 +432,19 @@ table .math.display {
   margin-top: 1rem;
 }
 .exercise-part:first-child { border-top: 0; }
-.exercise-part h4 { margin: .4rem 0 .6rem; color: var(--accent); }
+.exercise-part h5 { margin: .4rem 0 .6rem; color: var(--accent); }
 
 /* Word drawing canvases are rendered as one complete image by the build. */
 .word-diagram {
-  margin: 1.1rem 0 0;
-  padding: .75rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.1rem auto 0;
+  padding: .45rem;
   border: 1px solid var(--line);
   border-radius: .75rem;
   background: #fff;
   direction: ltr;
-  overflow-x: auto;
+  overflow: hidden;
 }
 .word-diagram img {
   width: auto;
@@ -450,11 +462,16 @@ table .math.display {
 }
 .word-code {
   overflow-x: auto;
-  background: #2a211a;
-  color: #fff8f0;
+  background: #f7f7f8;
+  color: #1f2937;
+  border: 1px solid #d7d9dd;
+  border-inline-start: 4px solid var(--accent);
   border-radius: .75rem;
   padding: 1rem 1rem 1rem 2.8rem;
   font: .9rem/1.55 Consolas, "Liberation Mono", monospace;
+}
+.word-code li::marker {
+  color: #8a5a24;
 }
 .source-note {
   padding: .65rem .8rem;

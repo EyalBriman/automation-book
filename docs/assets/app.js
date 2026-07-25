@@ -150,7 +150,7 @@
     if (Array.isArray(ex.parts) && ex.parts.length) {
       const partsHtml = ex.parts.map(part => `
         <section class="exercise-part">
-          <h4>סעיף ${part.label}${part.title ? ' · ' + part.title : ''}</h4>
+          <h5>סעיף ${part.label}${part.title ? ' · ' + part.title : ''}</h5>
           <div class="question-label">שאלה</div>
           <div class="question-body">${part.questionHtml}</div>
           <details class="solution">
@@ -189,18 +189,21 @@
 
   function renderExercises(sectionId = state.section || defaultSection()) {
     const list = document.getElementById('exercise-list');
+    const chapterTitle = document.getElementById('chapter-title');
     const title = document.getElementById('content-title');
     const intro = document.getElementById('content-intro');
     list.innerHTML = '';
 
     const exercises = allExercises().filter(e => e.section === sectionId);
+    const chapter = chapterForSection(sectionId);
+    chapterTitle.textContent = chapter ? `פרק ${chapter.number} ${chapter.title}` : '';
     title.textContent = sectionTitle(sectionId);
     intro.textContent = 'מוצגות כאן רק השאלות של הסעיף הנבחר. אפשר לעבור לסעיפים אחרים דרך התפריט הצדדי או דרך הסינון.';
 
     const marker = document.createElement('div');
     marker.id = `section-${sectionId.replaceAll('.', '-')}`;
     marker.className = 'section-marker';
-    marker.innerHTML = `<h3>${sectionTitle(sectionId)}</h3>`;
+    marker.setAttribute('aria-hidden', 'true');
     list.appendChild(marker);
 
     for (const ex of exercises) {
@@ -209,7 +212,7 @@
       article.id = `ex-${ex.id}`;
       article.innerHTML = `
         <div class="exercise-meta"><span>שאלה ${ex.number}</span><span>·</span><span>${sectionTitle(ex.section)}</span></div>
-        <h3 class="exercise-title">${ex.title}</h3>
+        <h4 class="exercise-title">${ex.number} ${ex.title}</h4>
         ${renderExerciseBody(ex)}
       `;
       list.appendChild(article);
