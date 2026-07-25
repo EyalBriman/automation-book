@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -127,7 +128,7 @@ if irrigation is None:
     errors.append("Missing irrigation-controller question 2.1.1")
 else:
     irrigation_solution = irrigation.get("solutionHtml", "")
-    for needle in ["תנאים להתחלת מחזור ההשקיה", "טבלת אמת עבור", "מפת קרנו עבור", "word-visual-2-1-1-karnaugh.png"]:
+    for needle in ["תנאים להתחלת מחזור ההשקיה", "טבלת אמת עבור", "מפת קרנו עבור", "word-fixed-2-1-1-karnaugh.png"]:
         if needle not in irrigation_solution:
             errors.append(f"2.1.1 solution is missing: {needle}")
 
@@ -138,16 +139,17 @@ required_visuals = [
     "word-visual-1-7-3-b.png",
     "word-visual-1-7-4.png",
     "word-visual-1-7-5-c.png",
-    "word-visual-2-1-1-karnaugh.png",
-    "word-visual-2-1-2-karnaugh.png",
-    "word-visual-2-2-1-fill-karnaugh.png",
-    "word-visual-2-2-1-drain-karnaugh.png",
-    "word-visual-2-2-1-light-karnaugh.png",
-    "word-visual-2-2-2-karnaugh.png",
-    "word-visual-2-2-3-karnaugh.png",
+    "word-fixed-2-1-1-karnaugh.png",
+    "word-fixed-2-1-2-karnaugh.png",
+    "word-fixed-2-2-1-fill-karnaugh.png",
+    "word-fixed-2-2-1-drain-karnaugh.png",
+    "word-fixed-2-2-1-light-karnaugh.png",
+    "word-fixed-2-2-2-karnaugh.png",
+    "word-fixed-2-2-3-karnaugh.png",
     "word-visual-5-2-a.png",
     "word-visual-5-3-c.png",
-    "word-visual-5-5-c.png",
+    "word-fixed-5-5-button.png",
+    "word-fixed-5-5-circuit.png",
 ]
 for filename in required_visuals:
     path = root / "media" / filename
@@ -155,6 +157,17 @@ for filename in required_visuals:
         errors.append(f"Missing or empty generated Word visual: {filename}")
     if filename not in raw:
         errors.append(f"Generated Word visual is not referenced: {filename}")
+
+fixed_visuals = Path(__file__).resolve().parent.parent / "source" / "fixed-visuals"
+for source_visual in sorted(fixed_visuals.glob("*.png")):
+    published_visual = root / "media" / source_visual.name
+    if not published_visual.exists():
+        errors.append(f"Missing fixed visual: {source_visual.name}")
+        continue
+    source_hash = hashlib.sha256(source_visual.read_bytes()).hexdigest()
+    published_hash = hashlib.sha256(published_visual.read_bytes()).hexdigest()
+    if source_hash != published_hash:
+        errors.append(f"Fixed visual changed during publication: {source_visual.name}")
 
 for legacy in ["1-7-1d-closed-loop.png", "1-1-3-kcl-circuit.png"]:
     if legacy in raw:

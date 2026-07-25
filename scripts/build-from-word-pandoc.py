@@ -57,6 +57,7 @@ class PartSpec:
     solution_start: Optional[int] = None
     solution_marker: bool = True
     visual: Optional[str] = None
+    additional_visuals: Sequence[str] = ()
 
 
 @dataclass(frozen=True)
@@ -230,7 +231,15 @@ GROUPED_EXERCISES: List[GroupedExerciseSpec] = [
     GroupedExerciseSpec("5.5.1", "5.5", "מועד א׳ 2024 סמסטר א", 2031, 2034, [
         PartSpec("א", "תפקיד הארדואינו", 2034, 2037, solution_start=2035),
         PartSpec("ב", "פעולת הקוד", 2037, 2045, solution_start=2038),
-        PartSpec("ג", "חיבור הרכיבים", 2045, 2049, solution_start=2046, visual="5-5-c"),
+        PartSpec(
+            "ג",
+            "חיבור הרכיבים",
+            2045,
+            2049,
+            solution_start=2046,
+            visual="5-5-button",
+            additional_visuals=("5-5-circuit",),
+        ),
     ]),
 ]
 
@@ -244,7 +253,7 @@ WORD_VISUALS: List[WordVisualSpec] = [
     WordVisualSpec("1-7-5-c", "word-visual-1-7-5-c.png", [1455, 1456, 1457, 1458, 1460], "דיאגרמת החוג הסגור עבור מועד א׳ 2024 סמסטר ב, סעיף ג"),
     WordVisualSpec(
         "2-2-1-fill-karnaugh",
-        "word-visual-2-2-1-fill-karnaugh.png",
+        "word-fixed-2-2-1-fill-karnaugh.png",
         [],
         "מפת קרנו צבעונית עבור מנוע המילוי בבקרת הראקטור",
         body_elements=[1509],
@@ -252,7 +261,7 @@ WORD_VISUALS: List[WordVisualSpec] = [
     ),
     WordVisualSpec(
         "2-2-1-drain-karnaugh",
-        "word-visual-2-2-1-drain-karnaugh.png",
+        "word-fixed-2-2-1-drain-karnaugh.png",
         [],
         "מפת קרנו צבעונית עבור ניקוז הראקטור",
         body_elements=[1516],
@@ -260,7 +269,7 @@ WORD_VISUALS: List[WordVisualSpec] = [
     ),
     WordVisualSpec(
         "2-2-1-light-karnaugh",
-        "word-visual-2-2-1-light-karnaugh.png",
+        "word-fixed-2-2-1-light-karnaugh.png",
         [],
         "מפת קרנו צבעונית עבור נורת החיווי בבקרת הראקטור",
         body_elements=[1526],
@@ -268,7 +277,7 @@ WORD_VISUALS: List[WordVisualSpec] = [
     ),
     WordVisualSpec(
         "2-1-1-karnaugh",
-        "word-visual-2-1-1-karnaugh.png",
+        "word-fixed-2-1-1-karnaugh.png",
         [],
         "מפת קרנו צבעונית עבור בקר ההשקיה",
         body_elements=[1554],
@@ -276,7 +285,7 @@ WORD_VISUALS: List[WordVisualSpec] = [
     ),
     WordVisualSpec(
         "2-1-2-karnaugh",
-        "word-visual-2-1-2-karnaugh.png",
+        "word-fixed-2-1-2-karnaugh.png",
         [],
         "מפת קרנו צבעונית עבור בקר המקרר התעשייתי",
         body_elements=[1584],
@@ -284,7 +293,7 @@ WORD_VISUALS: List[WordVisualSpec] = [
     ),
     WordVisualSpec(
         "2-2-2-karnaugh",
-        "word-visual-2-2-2-karnaugh.png",
+        "word-fixed-2-2-2-karnaugh.png",
         [],
         "מפת קרנו צבעונית עבור מנוע שער החניון",
         body_elements=[1614],
@@ -292,7 +301,7 @@ WORD_VISUALS: List[WordVisualSpec] = [
     ),
     WordVisualSpec(
         "2-2-3-karnaugh",
-        "word-visual-2-2-3-karnaugh.png",
+        "word-fixed-2-2-3-karnaugh.png",
         [],
         "מפת קרנו צבעונית עבור פקד הברז במערכת האכלת הכלב",
         body_elements=[1663],
@@ -300,7 +309,18 @@ WORD_VISUALS: List[WordVisualSpec] = [
     ),
     WordVisualSpec("5-2-a", "word-visual-5-2-a.png", [2587, 2588], "שרשרת האותות של המערכת האולטרסונית"),
     WordVisualSpec("5-3-c", "word-visual-5-3-c.png", list(range(2723, 2735)), "חיבור ארדואינו, מטריצת חיבורים, מיקרופון ונורות"),
-    WordVisualSpec("5-5-c", "word-visual-5-5-c.png", [2863, 2865], "חיבור ארדואינו למנורת שולחן ולכפתור קפיצי"),
+    WordVisualSpec(
+        "5-5-button",
+        "word-fixed-5-5-button.png",
+        [],
+        "חיבור שלוש רגלי הכפתור לכניסת הבקר, לאדמה ולמתח",
+    ),
+    WordVisualSpec(
+        "5-5-circuit",
+        "word-fixed-5-5-circuit.png",
+        [],
+        "חיבור ארדואינו, מקור מתח, נורת לד, נגד וכפתור",
+    ),
 ]
 
 CHAPTERS = [
@@ -566,35 +586,44 @@ def render_word_visuals(source: Path, docs_dir: Path, temp_dir: Path) -> Dict[st
     input_dir.mkdir(parents=True, exist_ok=True)
     pdf_dir.mkdir(parents=True, exist_ok=True)
     profile_dir.mkdir(parents=True, exist_ok=True)
+    fixed_dir = Path(__file__).resolve().parent.parent / "source" / "fixed-visuals"
+    media_dir = docs_dir / "media"
+    media_dir.mkdir(parents=True, exist_ok=True)
 
     docx_paths = []
+    rendered_visuals = []
     for visual in WORD_VISUALS:
+        fixed_source = fixed_dir / visual.filename
+        if fixed_source.is_file():
+            shutil.copy2(fixed_source, media_dir / visual.filename)
+            continue
         docx_path = input_dir / f"{visual.key}.docx"
         write_visual_docx(source, docx_path, visual.paragraphs, visual.body_elements)
         docx_paths.append(docx_path)
+        rendered_visuals.append(visual)
 
-    cmd = [
-        soffice,
-        f"-env:UserInstallation={profile_dir.resolve().as_uri()}",
-        "--headless",
-        "--convert-to", "pdf",
-        "--outdir", str(pdf_dir),
-        *[str(path) for path in docx_paths],
-    ]
-    try:
-        completed = subprocess.run(cmd, text=True, capture_output=True, check=True, timeout=180)
-    except subprocess.CalledProcessError as exc:
-        print(exc.stdout, file=sys.stdout)
-        print(exc.stderr, file=sys.stderr)
-        raise SystemExit(f"LibreOffice visual conversion failed with exit code {exc.returncode}")
-    except subprocess.TimeoutExpired:
-        raise SystemExit("LibreOffice visual conversion timed out.")
-    if completed.stderr.strip():
-        print(completed.stderr, file=sys.stderr)
+    if docx_paths:
+        cmd = [
+            soffice,
+            f"-env:UserInstallation={profile_dir.resolve().as_uri()}",
+            "--headless",
+            "--convert-to", "pdf",
+            "--outdir", str(pdf_dir),
+            *[str(path) for path in docx_paths],
+        ]
+        try:
+            completed = subprocess.run(cmd, text=True, capture_output=True, check=True, timeout=180)
+        except subprocess.CalledProcessError as exc:
+            print(exc.stdout, file=sys.stdout)
+            print(exc.stderr, file=sys.stderr)
+            raise SystemExit(f"LibreOffice visual conversion failed with exit code {exc.returncode}")
+        except subprocess.TimeoutExpired:
+            raise SystemExit("LibreOffice visual conversion timed out.")
+        if completed.stderr.strip():
+            print(completed.stderr, file=sys.stderr)
 
-    media_dir = docs_dir / "media"
     by_key = {visual.key: visual for visual in WORD_VISUALS}
-    for visual in WORD_VISUALS:
+    for visual in rendered_visuals:
         pdf_path = pdf_dir / f"{visual.key}.pdf"
         if not pdf_path.exists():
             raise SystemExit(f"LibreOffice did not create {pdf_path.name}.")
@@ -1034,11 +1063,12 @@ def build_grouped_exercise(
             solution_start=part.solution_start,
             solution_marker=part.solution_marker,
             visual=part.visual,
+            additional_visuals=part.additional_visuals,
         )
         question_html, solution_html = split_question_solution(children, part_spec)
         solution_html = attach_word_visuals(
             solution_html,
-            [part.visual] if part.visual else [],
+            ([part.visual] if part.visual else []) + list(part.additional_visuals),
             visuals,
         )
         if not question_html.strip():
