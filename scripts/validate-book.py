@@ -54,7 +54,7 @@ expected.update({"1.6.1א", "1.6.1ב", "1.6.2א", "1.6.2ב", "1.6.3"})
 expected.update(f"1.7.{i}" for i in range(1, 6))
 expected.update({"2.1.1", "2.1.2"})
 expected.update(f"2.2.{i}" for i in range(1, 5))
-expected.update(f"3.1.{i}" for i in range(1, 5))
+expected.update(f"3.1.{i}" for i in range(1, 6))
 expected.update({"3.2.1", "3.2.2"})
 for section in range(1, 8):
     expected.update(f"4.{section}.{i}" for i in range(1, 4))
@@ -67,8 +67,8 @@ if missing:
     errors.append("Missing exercises: " + ", ".join(missing))
 if extra:
     errors.append("Unexpected exercises: " + ", ".join(extra))
-if len(exercises) != 75:
-    errors.append(f"Expected 75 public exercises, found {len(exercises)}")
+if len(exercises) != 76:
+    errors.append(f"Expected 76 public exercises, found {len(exercises)}")
 
 ids = [exercise.get("id") for exercise in exercises]
 if len(ids) != len(set(ids)):
@@ -232,10 +232,17 @@ else:
     for needle in [".formula-line", ".word-code", ".word-diagram", ".source-note"]:
         if needle not in css_text:
             errors.append(f"CSS is missing {needle}")
+    for needle in [
+        "background: #fff !important;",
+        "color-scheme: light;",
+        "background: transparent !important;",
+    ]:
+        if needle not in css_text:
+            errors.append(f"CSS is missing enforced light figure/code styling: {needle}")
 
 if errors:
     print("Validation failed:")
     for error in errors:
         print(" -", error)
     sys.exit(1)
-print("Validation passed: 75 public exercises, fixed image dimensions, generated Word visuals, hierarchy, and publication-safety checks are complete.")
+print("Validation passed: 76 public exercises, fixed light-background visuals, hierarchy, and publication-safety checks are complete.")

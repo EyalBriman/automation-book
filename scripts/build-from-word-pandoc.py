@@ -21,7 +21,7 @@ import subprocess
 import sys
 import tempfile
 import zipfile
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from io import BytesIO
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
@@ -80,7 +80,7 @@ class WordVisualSpec:
     replace_table_index: Optional[int] = None
 
 
-# Explicit semantic map for Automation_book23July2026_solved.docx. The Word file does
+# Explicit semantic map for Automation_book23July2026_solved_proofread.docx. The Word file does
 # not use heading styles consistently, so stable top-level Pandoc block boundaries
 # are used for text. Multi-part exam questions remain one card with one <details>
 # solution per סעיף.
@@ -241,6 +241,71 @@ GROUPED_EXERCISES: List[GroupedExerciseSpec] = [
             additional_visuals=("5-5-circuit",),
         ),
     ]),
+]
+
+# The proofread edition removes one early empty block and adds the newly solved
+# image-processing exercise 3.1.2. Remap the unchanged exercises to the new
+# Pandoc block positions, and define Chapter 3 from its new semantic boundaries.
+def proofread_block_index(old_index: int) -> int:
+    if old_index <= 1330:
+        return old_index - 1
+    if old_index >= 1453:
+        return old_index + 36
+    raise ValueError(f"Chapter 3 index {old_index} must be declared explicitly")
+
+
+chapter_3_proofread = [
+    ExerciseSpec("3.1.1", "3.1", "תמונת VALUE ומסנן חידוד", 1330, 1340, solution_start=1337),
+    ExerciseSpec("3.1.2", "3.1", "סגמנטציה ידנית בעזרת K-means", 1340, 1377, solution_start=1343),
+    ExerciseSpec("3.1.3", "3.1", "תמונת רמות אפור והמרה לשחור־לבן", 1377, 1406, solution_start=1394),
+    ExerciseSpec("3.1.4", "3.1", "מלבן, מרכז כובד ומורפולוגיה", 1406, 1428, solution_start=1414),
+    ExerciseSpec("3.1.5", "3.1", "סף, מרכז כובד ומסנן קצוות", 1428, 1454, solution_start=1433),
+    ExerciseSpec("3.2.1", "3.2", "סגמנטציה בעזרת K-means", 1454, 1471, solution_start=1458),
+    ExerciseSpec("3.2.2", "3.2", "סגמנטציית קוביות בעזרת K-means", 1471, 1489, solution_start=1479),
+]
+
+remapped_exercises: List[ExerciseSpec] = []
+chapter_3_inserted = False
+for exercise in EXERCISES:
+    if exercise.section in {"3.1", "3.2"}:
+        if not chapter_3_inserted:
+            remapped_exercises.extend(chapter_3_proofread)
+            chapter_3_inserted = True
+        continue
+    remapped_exercises.append(
+        replace(
+            exercise,
+            start=proofread_block_index(exercise.start),
+            end=proofread_block_index(exercise.end),
+            solution_start=(
+                proofread_block_index(exercise.solution_start)
+                if exercise.solution_start is not None
+                else None
+            ),
+        )
+    )
+EXERCISES = remapped_exercises
+
+GROUPED_EXERCISES = [
+    replace(
+        grouped,
+        intro_start=proofread_block_index(grouped.intro_start),
+        intro_end=proofread_block_index(grouped.intro_end),
+        parts=[
+            replace(
+                part,
+                start=proofread_block_index(part.start),
+                end=proofread_block_index(part.end),
+                solution_start=(
+                    proofread_block_index(part.solution_start)
+                    if part.solution_start is not None
+                    else None
+                ),
+            )
+            for part in grouped.parts
+        ],
+    )
+    for grouped in GROUPED_EXERCISES
 ]
 
 
@@ -1154,7 +1219,7 @@ def build_data(
 
     return {
         "source": "private Word source (not included in the public repository)",
-        "build": "pandoc-html-word-drawings-rtl-v13",
+        "build": "pandoc-html-word-drawings-rtl-v15-proofread-light",
         "notes": "Public solved 23 July 2026 edition. Chapters 1 and 5, Chapter 2 sections 2.1–2.2, Chapter 3 sections 3.1–3.2, and Chapter 4 sections 4.1–4.7 are included. Unpublished source material remains excluded. Multi-part exam questions use a separate collapsible solution for every part. Word drawings and chart overlays are flattened into cropped images with fixed intrinsic dimensions.",
         "chapters": CHAPTERS,
         "exercises": exercises,

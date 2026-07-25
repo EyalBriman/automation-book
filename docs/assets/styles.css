@@ -442,7 +442,8 @@ table .math.display {
   padding: .45rem;
   border: 1px solid var(--line);
   border-radius: .75rem;
-  background: #fff;
+  background: #fff !important;
+  color-scheme: light;
   direction: ltr;
   overflow: hidden;
 }
@@ -451,6 +452,7 @@ table .math.display {
   max-width: 100%;
   max-height: 44rem;
   margin: 0 auto;
+  background: #fff !important;
 }
 
 /* Pandoc represents Word code listings as ordered-list containers. */
@@ -462,13 +464,18 @@ table .math.display {
 }
 .word-code {
   overflow-x: auto;
-  background: #f7f7f8;
-  color: #1f2937;
+  background: #fff !important;
+  color: #1f2937 !important;
+  color-scheme: light;
   border: 1px solid #d7d9dd;
   border-inline-start: 4px solid var(--accent);
   border-radius: .75rem;
   padding: 1rem 1rem 1rem 2.8rem;
   font: .9rem/1.55 Consolas, "Liberation Mono", monospace;
+}
+.word-code * {
+  background: transparent !important;
+  color: inherit !important;
 }
 .word-code li::marker {
   color: #8a5a24;
