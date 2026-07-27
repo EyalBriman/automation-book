@@ -179,7 +179,7 @@ if "word-drawings" not in data.get("build", ""):
     errors.append("Build metadata does not identify the Word-drawing renderer")
 
 chapter_status = {chapter.get("number"): chapter.get("status") for chapter in data.get("chapters", [])}
-if chapter_status != {"1": "implemented", "2": "partial", "3": "partial", "4": "implemented", "5": "implemented"}:
+if chapter_status != {"1": "implemented", "2": "implemented", "3": "partial", "4": "implemented", "5": "implemented"}:
     errors.append(f"Wrong chapter statuses: {chapter_status}")
 
 if raw.count("word-code") < 5:
@@ -193,6 +193,10 @@ public_section_ids = {
 }
 public_exercise_sections = {exercise.get("section") for exercise in exercises}
 public_exercise_numbers = {exercise.get("number") for exercise in exercises}
+if {"2.3", "3.4"} & public_section_ids:
+    errors.append("Unplanned review sections 2.3 or 3.4 are still present")
+if "3.3" not in public_section_ids:
+    errors.append("Planned image-processing section 3.3 is missing")
 if (
     unpublished_section in public_section_ids
     or unpublished_section in public_exercise_sections
@@ -240,9 +244,20 @@ else:
         if needle not in css_text:
             errors.append(f"CSS is missing enforced light figure/code styling: {needle}")
 
+chapter_2_2 = [exercise for exercise in exercises if exercise.get("section") == "2.2"]
+for exercise in chapter_2_2:
+    solution = exercise.get("solutionHtml", "")
+    soup_lists = re.findall(r'<ol[^>]*class="[^"]*controller-subanswers[^"]*"[^>]*type="A"', solution)
+    if "<ol" in solution and not soup_lists:
+        errors.append(f"Controller solution subparts are not lettered in {exercise.get('number')}")
+
+matrix_images = set(re.findall(r"media/(matrix-[^\"']+\.png)", raw))
+if len(matrix_images) < 8:
+    errors.append(f"Expected at least 8 rasterized image-processing matrices, found {len(matrix_images)}")
+
 if errors:
     print("Validation failed:")
     for error in errors:
         print(" -", error)
     sys.exit(1)
-print("Validation passed: 76 public exercises, fixed light-background visuals, hierarchy, and publication-safety checks are complete.")
+print("Validation passed: 76 public exercises, corrected Karnaugh maps, rasterized matrices, hierarchy, and publication-safety checks are complete.")

@@ -454,6 +454,19 @@ table .math.display {
   margin: 0 auto;
   background: #fff !important;
 }
+.matrix-figure {
+  padding: .8rem 1rem;
+}
+.matrix-figure img {
+  max-height: 30rem;
+}
+.controller-subanswers {
+  list-style-type: upper-alpha;
+}
+.controller-subanswers > li::marker {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
 
 /* Pandoc represents Word code listings as ordered-list containers. */
 .word-code,

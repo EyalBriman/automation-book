@@ -408,11 +408,10 @@ CHAPTERS = [
         "id": "chapter-2",
         "number": "2",
         "title": "לוגיקה ובקרים מתוכנתים",
-        "status": "partial",
+        "status": "implemented",
         "sections": [
             {"id": "2.1", "title": "לוגיקה"},
             {"id": "2.2", "title": "בקרים"},
-            {"id": "2.3", "title": "שאלות חזרה", "comingSoon": True},
         ],
     },
     {
@@ -424,7 +423,6 @@ CHAPTERS = [
             {"id": "3.1", "title": "סינון"},
             {"id": "3.2", "title": "סגמנטציה"},
             {"id": "3.3", "title": "מאפיינים", "comingSoon": True},
-            {"id": "3.4", "title": "שאלות חזרה", "comingSoon": True},
         ],
     },
     {
@@ -1050,6 +1048,143 @@ def stabilize_all_exercise_images(exercises: List[dict], docs_dir: Path) -> None
                     part[field] = stabilize_images_in_html(part[field], docs_dir)
 
 
+MATRIX_CELL_RE = re.compile(r"^(?:-?\d+(?:\.\d+)?(?:\s+[ABC])?|[ABC])$")
+
+
+def numeric_matrix_from_table(table: Tag) -> Optional[List[List[str]]]:
+    rows: List[List[str]] = []
+    for row in table.find_all("tr"):
+        cells = []
+        for cell in row.find_all(["th", "td"]):
+            value = " ".join(cell.get_text(" ", strip=True).split())
+            value = re.sub(r"(?<=\d)\s+(?=\d)", "", value)
+            cells.append(value)
+        if cells:
+            rows.append(cells)
+    if not rows or len(rows) > 8:
+        return None
+    width = len(rows[0])
+    if width < 2 or width > 8 or any(len(row) != width for row in rows):
+        return None
+    if any(
+        not MATRIX_CELL_RE.fullmatch(cell)
+        for row_index, row in enumerate(rows)
+        for column_index, cell in enumerate(row)
+        if not (row_index == 0 and column_index == 0 and cell == "")
+    ):
+        return None
+    return rows
+
+
+def render_matrix_image(matrix: List[List[str]], output: Path) -> Tuple[int, int]:
+    """Render a compact, immutable matrix with no alternating row colors."""
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+    except ImportError as exc:  # pragma: no cover
+        raise SystemExit("Missing dependency: Pillow. Install with: pip install -r requirements.txt") from exc
+
+    scale = 3
+    font_path = Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    face = ImageFont.truetype(str(font_path), 28 * scale)
+    probe = Image.new("RGB", (10, 10), "white")
+    probe_draw = ImageDraw.Draw(probe)
+    widest = max(
+        probe_draw.textbbox((0, 0), value, font=face)[2]
+        for row in matrix
+        for value in row
+    )
+    cell_width = max(64 * scale, widest + 28 * scale)
+    cell_height = 58 * scale
+    bracket_pad = 30 * scale
+    outer_pad = 16 * scale
+    content_width = len(matrix[0]) * cell_width
+    content_height = len(matrix) * cell_height
+    width = content_width + 2 * (bracket_pad + outer_pad)
+    height = content_height + 2 * outer_pad
+    image = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(image)
+
+    for row_index, row in enumerate(matrix):
+        for column_index, value in enumerate(row):
+            left = outer_pad + bracket_pad + column_index * cell_width
+            top = outer_pad + row_index * cell_height
+            bounds = draw.textbbox((0, 0), value, font=face)
+            text_width = bounds[2] - bounds[0]
+            text_height = bounds[3] - bounds[1]
+            draw.text(
+                (
+                    left + (cell_width - text_width) / 2,
+                    top + (cell_height - text_height) / 2 - bounds[1],
+                ),
+                value,
+                fill="#111827",
+                font=face,
+            )
+
+    line_width = 4 * scale
+    arm = 18 * scale
+    left = outer_pad + bracket_pad - 8 * scale
+    right = left + content_width + 16 * scale
+    top = outer_pad
+    bottom = top + content_height
+    draw.line((left + arm, top, left, top, left, bottom, left + arm, bottom), fill="#111827", width=line_width)
+    draw.line((right - arm, top, right, top, right, bottom, right - arm, bottom), fill="#111827", width=line_width)
+
+    final_size = (width // scale, height // scale)
+    image.resize(final_size, Image.Resampling.LANCZOS).save(output, "PNG", optimize=True)
+    return final_size
+
+
+def rasterize_image_processing_matrices(exercises: List[dict], docs_dir: Path) -> None:
+    """Replace small numeric Chapter 3 tables with compact matrix images."""
+    media_dir = docs_dir / "media"
+    media_dir.mkdir(parents=True, exist_ok=True)
+    for exercise in exercises:
+        if not str(exercise.get("section", "")).startswith("3."):
+            continue
+        for field in ("questionHtml", "solutionHtml"):
+            html = exercise.get(field, "")
+            if not html:
+                continue
+            soup = BeautifulSoup(html, "html.parser")
+            matrix_number = 0
+            for table in list(soup.find_all("table")):
+                matrix = numeric_matrix_from_table(table)
+                if matrix is None:
+                    continue
+                matrix_number += 1
+                filename = (
+                    f"matrix-{exercise['id']}-{field.removesuffix('Html').lower()}-"
+                    f"{matrix_number}.png"
+                )
+                width, height = render_matrix_image(matrix, media_dir / filename)
+                figure_html = (
+                    '<figure class="word-diagram matrix-figure" dir="ltr">'
+                    f'<img src="media/{filename}" alt="מטריצה עבור שאלה {exercise["number"]}" '
+                    f'width="{width}" height="{height}" loading="eager" decoding="sync" dir="ltr" />'
+                    "</figure>"
+                )
+                table.replace_with(BeautifulSoup(figure_html, "html.parser").find("figure"))
+            exercise[field] = str(soup).strip()
+
+
+def distinguish_controller_subanswers(exercises: List[dict]) -> None:
+    """Use Latin letters for answer subparts while questions retain 1,2,3."""
+    for exercise in exercises:
+        if exercise.get("section") != "2.2":
+            continue
+        soup = BeautifulSoup(exercise.get("solutionHtml", ""), "html.parser")
+        next_letter = 1
+        for ordered_list in soup.find_all("ol", recursive=False):
+            ordered_list["type"] = "A"
+            ordered_list["start"] = str(next_letter)
+            classes = set(ordered_list.get("class", []))
+            classes.add("controller-subanswers")
+            ordered_list["class"] = sorted(classes)
+            next_letter += len(ordered_list.find_all("li", recursive=False))
+        exercise["solutionHtml"] = str(soup).strip()
+
+
 
 
 def attach_word_visuals(
@@ -1215,12 +1350,14 @@ def build_data(
             "solutionHtml": solution_html,
         })
 
+    distinguish_controller_subanswers(exercises)
+    rasterize_image_processing_matrices(exercises, docs_dir)
     stabilize_all_exercise_images(exercises, docs_dir)
 
     return {
         "source": "private Word source (not included in the public repository)",
-        "build": "pandoc-html-word-drawings-rtl-v15-proofread-light",
-        "notes": "Public solved 23 July 2026 edition. Chapters 1 and 5, Chapter 2 sections 2.1–2.2, Chapter 3 sections 3.1–3.2, and Chapter 4 sections 4.1–4.7 are included. Unpublished source material remains excluded. Multi-part exam questions use a separate collapsible solution for every part. Word drawings and chart overlays are flattened into cropped images with fixed intrinsic dimensions.",
+        "build": "pandoc-html-word-drawings-rtl-v16-corrected-maps-matrices",
+        "notes": "Public solved 23 July 2026 edition. Chapters 1 and 5, completed Chapter 2 sections 2.1–2.2, Chapter 3 sections 3.1–3.2 with section 3.3 planned, and Chapter 4 sections 4.1–4.7 are included. Unpublished source material remains excluded. Multi-part exam questions use a separate collapsible solution for every part. Karnaugh maps and image-processing matrices are flattened into verified images with fixed intrinsic dimensions.",
         "chapters": CHAPTERS,
         "exercises": exercises,
     }
