@@ -1,55 +1,69 @@
-# ספר תרגילים באוטומציה ומערכות משולבות
+# Automation and Integrated Systems Exercise Book
 
-הפרויקט בונה אתר GitHub Pages מתוך מסמך Word ראשי. גרסת המקור המצורפת למסירה
-היא `private-source/Automation_book4Aug2026.docx`, והיא כבר נבנתה לאתר שבתיקייה
-`docs/`.
+This project builds a Hebrew GitHub Pages exercise book from a canonical Word
+document. The source version included in this handoff is:
 
-הבנייה הנוכחית מזהה שאלות לפי מבנה המסמך ולא לפי מספרי שורות או מיקומי Pandoc
-קבועים. לכן אפשר להוסיף שאלה חדשה באותו מבנה של השאלות הסמוכות, להוסיף פסקת
-`פתרון`, ולבנות מחדש.
+`private-source/Automation_book4Aug2026.docx`
 
-## התחלה מהירה
+The generated, publishable website is already available in `docs/`.
 
-Windows: לחיצה כפולה על `BUILD_SITE_WINDOWS.bat`. אפשר גם לגרור עליו קובץ Word
-חדש יותר.
+The current importer discovers chapters, sections, questions, and solutions
+from the Word document structure. It no longer depends on fixed Pandoc block
+positions. A manager can therefore add a question by copying the structure of
+a nearby question, adding a separate `פתרון` paragraph, and rebuilding the
+site.
 
-macOS או Linux:
+## Quick start
+
+On Windows, double-click `BUILD_SITE_WINDOWS.bat`. A newer Word file can also
+be dragged onto that file.
+
+On macOS or Linux:
 
 ```bash
 bash BUILD_SITE.sh
 ```
 
-לאחר בדיקה בדפדפן, פרסום ב־GitHub:
+After checking the generated site, publish it with:
 
 ```bash
 bash PUBLISH_TO_GITHUB.sh
 ```
 
-ברירת המחדל של סקריפט הפרסום היא
-`https://github.com/EyalBriman/automation-book.git`. למאגר אחר:
+The default repository is:
+
+`https://github.com/EyalBriman/automation-book.git`
+
+To use another repository:
 
 ```bash
 REPO_URL="https://github.com/USER/REPOSITORY.git" bash PUBLISH_TO_GITHUB.sh
 ```
 
-## תוכנות נדרשות
+## Required software
 
-- Python 3.10 ומעלה.
+- Python 3.10 or newer.
 - Pandoc.
 - LibreOffice Writer.
-- Git ו־rsync רק עבור `PUBLISH_TO_GITHUB.sh`.
-- חבילות Python מתוך `requirements.txt`; סקריפט הבנייה מתקין אותן אוטומטית.
+- Git and `rsync` for `PUBLISH_TO_GITHUB.sh`.
+- The Python packages listed in `requirements.txt`.
 
-## מה נוצר
+The build helpers install or check the Python packages automatically.
 
-- `docs/` — האתר המוכן לפרסום.
-- `docs/assets/book-data.js` — השאלות, הפתרונות ומבנה הספר.
-- `docs/media/` — התמונות והשרטוטים שהאתר משתמש בהם בפועל.
+## Generated files
 
-קובץ ה־Word אינו נטען ישירות בדפדפן. בכל שינוי צריך להריץ בנייה מחדש. כיוון
-העמוד מוגדר RTL באתר; עברית נשארת RTL, ואנגלית, נוסחאות וקוד מבודדים כ־LTR.
+- `docs/` contains the complete public website.
+- `docs/assets/book-data.js` contains the generated book structure, questions,
+  and solutions.
+- `docs/media/` contains only images referenced by the public website.
 
-## פקודות ידניות
+The browser does not read the Word file directly. Every Word change requires a
+new build and validation run.
+
+The website controls text direction: Hebrew paragraphs use RTL, while English,
+mathematical expressions, variables, and Arduino code are isolated as LTR.
+
+## Manual build commands
 
 ```bash
 python3 -m pip install -r requirements.txt
@@ -58,19 +72,26 @@ python3 scripts/build-from-word-semantic.py \
 python3 scripts/validate-book.py --docs docs
 ```
 
-## פרטיות ופרסום
+## Privacy and publication safety
 
-קובצי `.docx` מוחרגים מ־Git. סקריפט הפרסום גם מוחרג במפורש את
-`private-source/` ואת כל קובצי ה־Word, ולכן המקור והפתרונות הפרטיים אינם
-נשלחים למאגר הציבורי. הקובץ נשאר בתוך ZIP המסירה לצורך העדכון הבא.
+All `.docx` files and the complete `private-source/` directory are ignored by
+Git. The publishing script also explicitly excludes Word files and the private
+source directory.
 
-הוראות מדויקות לעריכת שאלה, הוספת שאלה ובדיקת התוצאה נמצאות ב־
-[מדריך למנהל הקורס](COURSE_MANAGER_GUIDE_HE.md).
+The source Word document is included in the handoff ZIP so that the course
+manager can prepare the next version. It must not be uploaded to the public
+GitHub repository.
 
-## כללי פרסום נוכחיים
+See [COURSE_MANAGER_GUIDE.md](COURSE_MANAGER_GUIDE.md) for the complete editing,
+building, checking, and publication procedure.
 
-- גרסת August 2026 מפרסמת 77 שאלות, כולל שאלה 3.2.3 על mean shift.
-- הכותרות הריקות ב־3.3 נשארות במצב מתוכנן עד שיופיעו תחתיהן שאלה ופתרון.
-- סעיף 4.8 אינו מפורסם בכוונה.
-- הכותרות הכפולות בפרק 5 מוצגות באתר כרצף 5.1–5.5.
+## Current publication rules
+
+- The August 2026 build publishes 77 questions, including the new mean-shift
+  question 3.2.3.
+- The two empty question headings in section 3.3 remain drafts until they have
+  complete question and solution content.
+- Section 4.8 is intentionally excluded from publication.
+- Duplicate exam headings in chapter 5 are published sequentially as sections
+  5.1 through 5.5.
 
