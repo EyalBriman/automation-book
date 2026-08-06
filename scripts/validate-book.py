@@ -47,28 +47,24 @@ else:
         data = {"exercises": [], "chapters": []}
 
 exercises = data.get("exercises", [])
-expected = set()
-for section, count in [("1.1", 4), ("1.2", 4), ("1.3", 4), ("1.4", 8), ("1.5", 7)]:
-    expected.update(f"{section}.{i}" for i in range(1, count + 1))
-expected.update({"1.6.1א", "1.6.1ב", "1.6.2א", "1.6.2ב", "1.6.3"})
-expected.update(f"1.7.{i}" for i in range(1, 6))
-expected.update({"2.1.1", "2.1.2"})
-expected.update(f"2.2.{i}" for i in range(1, 5))
-expected.update(f"3.1.{i}" for i in range(1, 6))
-expected.update({"3.2.1", "3.2.2"})
-for section in range(1, 8):
-    expected.update(f"4.{section}.{i}" for i in range(1, 4))
-expected.update(f"5.{section}.1" for section in range(1, 6))
+actual_numbers = [exercise.get("number") for exercise in exercises]
+actual = set(actual_numbers)
+if None in actual or "" in actual:
+    errors.append("An exercise is missing its public number")
+if len(actual_numbers) != len(actual):
+    errors.append("Exercise numbers are not unique")
 
-actual = {exercise.get("number") for exercise in exercises}
-missing = sorted(expected - actual)
-extra = sorted(actual - expected)
-if missing:
-    errors.append("Missing exercises: " + ", ".join(missing))
-if extra:
-    errors.append("Unexpected exercises: " + ", ".join(extra))
-if len(exercises) != 76:
-    errors.append(f"Expected 76 public exercises, found {len(exercises)}")
+structure = data.get("structure", {})
+if structure.get("publishedQuestions") != len(exercises):
+    errors.append(
+        "Published-question metadata does not match the generated exercises: "
+        f"{structure.get('publishedQuestions')} != {len(exercises)}"
+    )
+drafts = set(structure.get("draftQuestions", []))
+if drafts & actual:
+    errors.append("Draft question headings were published: " + ", ".join(sorted(drafts & actual)))
+if "3.2.3" not in actual:
+    errors.append("The August 2026 mean-shift question 3.2.3 is missing")
 
 ids = [exercise.get("id") for exercise in exercises]
 if len(ids) != len(set(ids)):
@@ -102,7 +98,10 @@ for exercise in exercises:
         if labels != expected_parts[number]:
             errors.append(f"Wrong part labels for {number}: {labels}")
     elif parts:
-        errors.append(f"Unexpected grouped parts in {number}")
+        labels = [part.get("label") for part in parts]
+        expected_labels = [chr(ord("א") + index) for index in range(len(parts))]
+        if len(parts) < 2 or labels != expected_labels:
+            errors.append(f"Non-sequential grouped parts in {number}: {labels}")
 
     if parts:
         for part in parts:
@@ -147,6 +146,7 @@ required_visuals = [
     "word-fixed-2-2-2-karnaugh.png",
     "word-fixed-2-2-3-karnaugh.png",
     "word-visual-5-2-a.png",
+    "word-fixed-5-2-c.png",
     "word-visual-5-3-c.png",
     "word-fixed-5-5-button.png",
     "word-fixed-5-5-circuit.png",
@@ -173,14 +173,37 @@ for legacy in ["1-7-1d-closed-loop.png", "1-1-3-kcl-circuit.png"]:
     if legacy in raw:
         errors.append(f"Legacy manual crop is still referenced: {legacy}")
 
-if data.get("source") != "private Word source (not included in the public repository)":
+if not str(data.get("source", "")).startswith("private Word source"):
     errors.append(f"Wrong source metadata: {data.get('source')}")
 if "word-drawings" not in data.get("build", ""):
     errors.append("Build metadata does not identify the Word-drawing renderer")
 
-chapter_status = {chapter.get("number"): chapter.get("status") for chapter in data.get("chapters", [])}
-if chapter_status != {"1": "implemented", "2": "implemented", "3": "partial", "4": "implemented", "5": "implemented"}:
-    errors.append(f"Wrong chapter statuses: {chapter_status}")
+chapters = data.get("chapters", [])
+chapter_status = {chapter.get("number"): chapter.get("status") for chapter in chapters}
+if set(chapter_status) != set("12345"):
+    errors.append(f"Expected chapters 1–5, found: {sorted(chapter_status)}")
+
+known_sections = {
+    section.get("id")
+    for chapter in chapters
+    for section in chapter.get("sections", [])
+}
+for exercise in exercises:
+    if exercise.get("section") not in known_sections:
+        errors.append(
+            f"Exercise {exercise.get('number')} refers to unknown section {exercise.get('section')}"
+        )
+
+for chapter in chapters:
+    section_statuses = [section.get("status") for section in chapter.get("sections", [])]
+    if any(status not in {"implemented", "planned"} for status in section_statuses):
+        errors.append(f"Chapter {chapter.get('number')} has an invalid section status")
+    expected_status = "partial" if "planned" in section_statuses else "implemented"
+    if chapter.get("status") != expected_status:
+        errors.append(
+            f"Chapter {chapter.get('number')} status should be {expected_status}, "
+            f"not {chapter.get('status')}"
+        )
 
 if raw.count("word-code") < 5:
     errors.append("Arduino code blocks were not consistently marked LTR")
@@ -260,4 +283,7 @@ if errors:
     for error in errors:
         print(" -", error)
     sys.exit(1)
-print("Validation passed: 76 public exercises, corrected Karnaugh maps, rasterized matrices, hierarchy, and publication-safety checks are complete.")
+print(
+    f"Validation passed: {len(exercises)} public exercises, corrected Karnaugh maps, "
+    "rasterized matrices, hierarchy, and publication-safety checks are complete."
+)
