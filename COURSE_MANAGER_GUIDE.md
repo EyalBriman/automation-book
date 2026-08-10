@@ -1,44 +1,64 @@
-# Course Manager Guide: Editing and Adding Questions
+# Course Manager Guide: Editing, Adding, and Deleting Questions
 
-This guide is intended for a course manager who is not a programmer.
+This guide is for a course manager who is not a programmer.
 
-The short version is: **edit the Word file, rebuild the website, inspect the
-result, and only then publish the generated public files.** Replacing or
+The short version is: **make the change in Word, rebuild the website, inspect
+the result, and only then publish the generated public files.** Replacing or
 uploading the Word file alone does not update the website.
 
-## Canonical Word source
+The Windows helper supports three types of changes:
 
-The default source file is:
+1. Edit an existing question.
+2. Add a new question.
+3. Delete a question from the public website by turning its Word heading into
+   an empty draft.
+
+The helper does not edit Word for you. It reads the Word file, builds a safe
+temporary copy of the website, reports which questions changed, validates the
+result, and replaces `docs/` only if validation succeeds.
+
+## Before every change
+
+1. Start from the newest Word file and newest repository version.
+2. Make a backup copy of the Word file.
+3. Edit only the private Word source. Do not edit `docs/assets/book-data.js` or
+   other generated website files by hand.
+4. Use one Word editor at a time when possible.
+
+The default source location is:
 
 `private-source/Automation_book4Aug2026.docx`
 
-Create a backup before editing it. A new version can replace this file using
-the same filename, or it can be kept elsewhere and passed to the build helper.
+If the DOCX is stored elsewhere, drag it onto `BUILD_SITE_WINDOWS.bat`.
 
-On Windows, a different DOCX file can simply be dragged onto
-`BUILD_SITE_WINDOWS.bat`.
+## Editing an existing question
 
-## Changing an existing word, number, formula, question, or solution
+1. Open the current Word file.
+2. Find the question.
+3. Edit inside the existing question block.
+4. Keep the question heading at the same Word list level.
+5. Keep `פתרון` or `פתרון:` in its own separate paragraph.
+6. Edit the solution, images, and tables as needed.
+7. Save and close Microsoft Word.
+8. Run `BUILD_SITE_WINDOWS.bat` and choose **E** for Edit.
+9. Confirm that the change summary lists the expected changed number and does
+   not show an unexpected addition, removal, or renumbering warning.
+10. Inspect the changed question, its solution, and the questions immediately
+    before and after it.
 
-1. Open the canonical Word file.
-2. Edit the existing content without deleting the question heading or its
-   `פתרון` paragraph.
-3. Save and close Microsoft Word.
-4. Run the build helper.
-5. Inspect the changed question, its solution, and the questions immediately
-   before and after it.
-6. Publish only after validation succeeds.
+Do not type or change the public question number as ordinary text. For normal
+questions, the importer reads the Word list structure and calculates the public
+number.
 
 ## Adding a new question
 
 The safest method is to copy a complete question from the same section,
 including its question heading, content, `פתרון` paragraph, and solution. Paste
 it immediately after the last question in that section and replace its content.
+Adding at the end avoids renumbering existing questions and their
+question-specific diagrams.
 
-This preserves the Word style, list level, and numbering structure recognized
-by the importer.
-
-### Chapters 1–3
+### Chapters 1 to 3
 
 1. Copy an entire existing question from the same section.
 2. Paste it after the last question in that section.
@@ -46,11 +66,13 @@ by the importer.
    question number manually in a normal paragraph.
 4. Replace the question content.
 5. Keep a separate paragraph containing exactly `פתרון` or `פתרון:`.
-6. Replace the solution content and save the document.
+6. Replace the solution content.
+7. Save and close Word.
+8. Run `BUILD_SITE_WINDOWS.bat` and choose **A** for Add.
+9. Confirm that the change summary lists the new public question number.
 
-The public question number is generated from its position. For example, the
-third question in section 3.2 becomes 3.2.3. This is how the mean-shift question
-was added in the August 2026 version.
+The public number is generated from the question's position. For example, the
+third question in section 3.2 becomes 3.2.3.
 
 ### Chapter 4
 
@@ -71,14 +93,44 @@ Several existing exams contain historical formatting exceptions that the
 importer already recognizes. New questions should use the regular structure
 with an explicit solution paragraph for every part.
 
-## When a question is not published
+## Deleting a question from the public website
+
+### Safe method for the course manager
+
+Do not physically delete a middle question heading. That would renumber later
+questions in the same section and may attach an established diagram to the
+wrong question.
+
+Instead, turn the question into an empty draft:
+
+1. Make a backup of the Word file.
+2. Find the question to remove.
+3. Keep only its styled question heading. Do not change its Word list level.
+4. Delete the question text below the heading.
+5. Delete the separate `פתרון` or `פתרון:` paragraph.
+6. Delete the solution text, images, and tables belonging to that question.
+7. Save and close Word.
+8. Run `BUILD_SITE_WINDOWS.bat` and choose **D** for Delete.
+9. In the change summary, confirm that the number appears under
+   `Removed public numbers` and under `Draft headings`.
+10. In the opened website, confirm that the question is absent and that the
+    questions before and after it are still correct.
+
+This leaves an unused heading in the private Word source. The heading keeps
+later public numbers stable, but the empty draft is not published.
+
+If the number itself must disappear and all later questions must be renumbered,
+ask the technical maintainer to do that migration. Every later title, solution,
+fixed image, and cross-reference in the section must then be checked.
+
+## Draft questions
 
 A question heading without a recognized solution paragraph is treated as a
-draft and is not published. The two empty headings in section 3.3 currently use
-this behavior.
+draft and is not published. Empty draft headings are used both for planned
+questions and for safely removing a question without renumbering later content.
 
-Once real question content and a `פתרון` paragraph are added, the question will
-be included in the next build.
+To publish a draft later, add real question content, a separate `פתרון`
+paragraph, and the solution. It will be included in the next successful build.
 
 ## Images, tables, and diagrams
 
@@ -100,7 +152,7 @@ controls directionality during the build:
 - English text, variables, formulas, and Arduino code are isolated as LTR.
 - Images receive fixed dimensions to prevent layout movement during loading.
 
-No HTML or RTL code should be added to the Word file. After every update, check
+Do not add HTML or RTL code to the Word file. After every update, check
 parentheses, numbers, units, formulas, and English text in the browser.
 
 ## One-time installation on Windows
@@ -119,8 +171,14 @@ Restart Windows after installation.
 1. Close Microsoft Word.
 2. Double-click `BUILD_SITE_WINDOWS.bat` to use the bundled source, or drag a
    newer DOCX file onto it.
-3. Wait for `BUILD AND VALIDATION SUCCEEDED`.
-4. Inspect the website opened by the helper.
+3. Choose **E**, **A**, or **D** to describe the Word change.
+4. If deleting, read the safe-deletion reminder and continue.
+5. Read the `QUESTION CHANGE SUMMARY` in the command window.
+6. Wait for `BUILD AND VALIDATION SUCCEEDED`.
+7. Inspect the website opened by the helper.
+
+The helper builds in a temporary folder first. If conversion or validation
+fails, the existing `docs/` website is not replaced.
 
 If an error appears, do not publish. Copy the complete error message and send
 it to the technical maintainer.
@@ -139,10 +197,16 @@ To build from another Word file:
 bash BUILD_SITE.sh "/full/path/to/new-version.docx"
 ```
 
+The Windows operation menu and change summary are provided by the BAT workflow.
+On macOS or Linux, manually inspect the generated question list after building.
+
 ## Inspection checklist
 
 Before publication, confirm that:
 
+- The change summary matches the intended edit, addition, or deletion.
+- No unexpected renumbering warning appears. If it does, inspect every shifted
+  question and contact the technical maintainer before publishing.
 - The question number and title are correct.
 - The question and solution were not reversed.
 - All intended text, and only intended text, is public.
@@ -170,15 +234,17 @@ upload a ZIP through the GitHub website.
 ## Receiving a new Word version
 
 1. Keep a backup of the new DOCX file.
-2. Confirm that new questions follow the structures described above.
-3. Replace `private-source/Automation_book4Aug2026.docx`, or provide the new
-   file path to the build helper.
+2. Confirm that edits, additions, and deletions follow the structures described
+   above.
+3. Replace `private-source/Automation_book4Aug2026.docx`, or drag the new file
+   onto the Windows helper.
 4. Build and validate the website.
-5. Manually inspect all new questions and section boundaries.
+5. Read the change summary and inspect all affected questions and section
+   boundaries.
 6. Publish the generated website and code, but never the Word source.
 
 ## Golden rule
 
-Copy a complete template from the same section, keep `פתרון` in a separate
-paragraph, rebuild, inspect, and only then publish.
-
+Edit in place, add by copying a complete nearby block, and delete by leaving an
+empty draft heading. Keep `פתרון` separate, rebuild, inspect, and only then
+publish.

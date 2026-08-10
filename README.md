@@ -1,22 +1,28 @@
 # Automation and Integrated Systems Exercise Book
 
 This project builds a Hebrew GitHub Pages exercise book from a canonical Word
-document. The source version included in this handoff is:
+document. The default private source path is:
 
 `private-source/Automation_book4Aug2026.docx`
+
+If this handoff does not include the private source, drag the current `.docx`
+onto `BUILD_SITE_WINDOWS.bat` or place it at that path before building.
 
 The generated, publishable website is already available in `docs/`.
 
 The current importer discovers chapters, sections, questions, and solutions
 from the Word document structure. It no longer depends on fixed Pandoc block
-positions. A manager can therefore add a question by copying the structure of
-a nearby question, adding a separate `פתרון` paragraph, and rebuilding the
-site.
+positions. A manager can therefore edit a question in place, add a question by
+copying nearby structure, or remove a question from the public site by leaving
+its styled heading as an empty draft. Every published solution uses a separate
+`פתרון` paragraph.
 
 ## Quick start
 
 On Windows, double-click `BUILD_SITE_WINDOWS.bat`. A newer Word file can also
-be dragged onto that file.
+be dragged onto that file. The helper asks whether the change was an edit, an
+addition, or a deletion, prints a question-change summary, and only replaces
+`docs/` after a staged build passes validation.
 
 On macOS or Linux:
 
@@ -78,9 +84,9 @@ All `.docx` files and the complete `private-source/` directory are ignored by
 Git. The publishing script also explicitly excludes Word files and the private
 source directory.
 
-The source Word document is included in the handoff ZIP so that the course
-manager can prepare the next version. It must not be uploaded to the public
-GitHub repository.
+If the private Word source is not bundled in a handoff ZIP, drag the current
+DOCX file onto `BUILD_SITE_WINDOWS.bat`. The Word source must never be uploaded
+to the public GitHub repository.
 
 See [COURSE_MANAGER_GUIDE.md](COURSE_MANAGER_GUIDE.md) for the complete editing,
 building, checking, and publication procedure.
@@ -94,4 +100,3 @@ building, checking, and publication procedure.
 - Section 4.8 is intentionally excluded from publication.
 - Duplicate exam headings in chapter 5 are published sequentially as sections
   5.1 through 5.5.
-

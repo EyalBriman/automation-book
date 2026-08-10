@@ -425,6 +425,17 @@ def semantic_structure(source: Path, marked_output: Path) -> Structure:
             end_index = later[0][0] if later else len(records)
             question.end_marker = later[0][1] if later else None
 
+            # A course manager can safely remove a question from the public
+            # book without renumbering everything that follows it: keep the
+            # styled question heading, and remove the question body and its
+            # solution block.  Such an empty heading is a deliberate draft.
+            # Detect it before the historical multi-part special cases below,
+            # which otherwise expect their old part structure to be present.
+            body_records = records[question.paragraph_index + 1 : end_index]
+            if not any(record.text.strip() for record in body_records):
+                question.draft = True
+                continue
+
             # Two archived exams contain six lettered parts, but a few worked
             # answers begin immediately after the part instead of using a
             # standalone "פתרון" line.  Their six question paragraphs share
