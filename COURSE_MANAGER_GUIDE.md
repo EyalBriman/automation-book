@@ -1,4 +1,4 @@
-# Course Manager Guide: Editing, Adding, and Deleting Questions
+# Course Manager Guide: Editing, Adding, Deleting, and Mixed Changes
 
 This guide is for a course manager who is not a programmer.
 
@@ -6,12 +6,14 @@ The short version is: **make the change in Word, rebuild the website, inspect
 the result, and only then publish the generated public files.** Replacing or
 uploading the Word file alone does not update the website.
 
-The Windows helper supports three types of changes:
+The Windows helper supports four modes:
 
 1. Edit an existing question.
 2. Add a new question.
 3. Delete a question from the public website by turning its Word heading into
    an empty draft.
+4. Process mixed changes when one Word version contains any combination of
+   edits, additions, and deletions.
 
 The helper does not edit Word for you. It reads the Word file, builds a safe
 temporary copy of the website, reports which questions changed, validates the
@@ -171,7 +173,8 @@ Restart Windows after installation.
 1. Close Microsoft Word.
 2. Double-click `BUILD_SITE_WINDOWS.bat` to use the bundled source, or drag a
    newer DOCX file onto it.
-3. Choose **E**, **A**, or **D** to describe the Word change.
+3. Choose **E** for edits only, **A** for additions only, **D** for deletions
+   only, or **M** when the Word file contains more than one type of change.
 4. If deleting, read the safe-deletion reminder and continue.
 5. Read the `QUESTION CHANGE SUMMARY` in the command window.
 6. Wait for `BUILD AND VALIDATION SUCCEEDED`.
@@ -204,7 +207,8 @@ On macOS or Linux, manually inspect the generated question list after building.
 
 Before publication, confirm that:
 
-- The change summary matches the intended edit, addition, or deletion.
+- The change summary matches the intended edit, addition, deletion, or mixed
+  set of changes.
 - No unexpected renumbering warning appears. If it does, inspect every shifted
   question and contact the technical maintainer before publishing.
 - The question number and title are correct.
@@ -223,6 +227,17 @@ The included Bash helper can build, validate, and publish:
 ```bash
 bash PUBLISH_TO_GITHUB.sh
 ```
+
+On Windows, first complete the BAT build and inspect the preview. Then open Git
+Bash in the project folder and upload the already-generated site with:
+
+```bash
+SKIP_BUILD=1 bash PUBLISH_TO_GITHUB.sh
+```
+
+This prebuilt upload mode does not require Python, Pandoc, or LibreOffice. It
+checks that the essential generated website files exist and then uploads the
+already-validated `docs/` folder.
 
 The script excludes `private-source/` and all Word files from the public
 repository.

@@ -5,8 +5,9 @@ document. The default private source path is:
 
 `private-source/Automation_book4Aug2026.docx`
 
-If this handoff does not include the private source, drag the current `.docx`
-onto `BUILD_SITE_WINDOWS.bat` or place it at that path before building.
+This complete handoff includes the current private Word source at that path, so
+`BUILD_SITE_WINDOWS.bat` can be started by double-clicking it. A newer `.docx`
+can instead be dragged onto the helper.
 
 The generated, publishable website is already available in `docs/`.
 
@@ -20,9 +21,9 @@ its styled heading as an empty draft. Every published solution uses a separate
 ## Quick start
 
 On Windows, double-click `BUILD_SITE_WINDOWS.bat`. A newer Word file can also
-be dragged onto that file. The helper asks whether the change was an edit, an
-addition, or a deletion, prints a question-change summary, and only replaces
-`docs/` after a staged build passes validation.
+be dragged onto that file. The helper supports edit-only, add-only,
+delete-only, and mixed changes, prints a question-change summary, and only
+replaces `docs/` after a staged build passes validation.
 
 On macOS or Linux:
 
@@ -35,6 +36,16 @@ After checking the generated site, publish it with:
 ```bash
 bash PUBLISH_TO_GITHUB.sh
 ```
+
+On Windows, after `BUILD_SITE_WINDOWS.bat` has already ended with
+`BUILD AND VALIDATION SUCCEEDED`, open Git Bash in the project folder and use:
+
+```bash
+SKIP_BUILD=1 bash PUBLISH_TO_GITHUB.sh
+```
+
+This uploads the existing, already-validated generated site without trying to
+run Python, Pandoc, or LibreOffice a second time inside Git Bash.
 
 The default repository is:
 
@@ -51,7 +62,7 @@ REPO_URL="https://github.com/USER/REPOSITORY.git" bash PUBLISH_TO_GITHUB.sh
 - Python 3.10 or newer.
 - Pandoc.
 - LibreOffice Writer.
-- Git and `rsync` for `PUBLISH_TO_GITHUB.sh`.
+- Git for `PUBLISH_TO_GITHUB.sh`.
 - The Python packages listed in `requirements.txt`.
 
 The build helpers install or check the Python packages automatically.
@@ -84,9 +95,9 @@ All `.docx` files and the complete `private-source/` directory are ignored by
 Git. The publishing script also explicitly excludes Word files and the private
 source directory.
 
-If the private Word source is not bundled in a handoff ZIP, drag the current
-DOCX file onto `BUILD_SITE_WINDOWS.bat`. The Word source must never be uploaded
-to the public GitHub repository.
+The Word source is included in this handoff ZIP for local course management.
+It is ignored by Git and excluded by the publishing script, so it is not
+uploaded to the public GitHub repository.
 
 See [COURSE_MANAGER_GUIDE.md](COURSE_MANAGER_GUIDE.md) for the complete editing,
 building, checking, and publication procedure.

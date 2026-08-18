@@ -1,6 +1,20 @@
 @echo off
+if defined AUTOMATION_BOOK_BUILD_INNER goto :inner_build
+setlocal
+set "AUTOMATION_BOOK_BUILD_INNER=1"
+call "%~f0" %*
+set "AUTOMATION_BOOK_BUILD_RESULT=%ERRORLEVEL%"
+echo.
+if not "%AUTOMATION_BOOK_BUILD_RESULT%"=="0" echo The build stopped with error code %AUTOMATION_BOOK_BUILD_RESULT%.
+echo The window will remain open so you can read or copy the complete output.
+choice /C X /N /M "Press X to close this window: "
+exit /b %AUTOMATION_BOOK_BUILD_RESULT%
+
+:inner_build
 setlocal
 chcp 65001 >nul
+set "PYTHONUTF8=1"
+set "PYTHONIOENCODING=utf-8"
 
 set "PROJECT_DIR=%~dp0"
 cd /d "%PROJECT_DIR%"
@@ -15,12 +29,19 @@ if not defined WORD_FILE goto :missing_word
 if not exist "%WORD_FILE%" goto :missing_word
 
 echo.
+echo Automation Book build started.
+echo Keep this window open. A full rebuild may take several minutes.
+echo Word source: %WORD_FILE%
+echo.
 echo What did you change in Word?
-echo   [E] Edit an existing question
-echo   [A] Add a new question
-echo   [D] Delete or unpublish a question
-choice /C EAD /N /M "Choose E, A, or D: "
-if errorlevel 3 (
+echo   [E] Edit existing questions only
+echo   [A] Add questions only
+echo   [D] Delete or unpublish questions only
+echo   [M] Mixed changes: any combination of Edit, Add, and Delete
+choice /C EADM /N /M "Press E, A, D, or M (do not press Enter): "
+if errorlevel 4 (
+  set "CHANGE_TYPE=mixed"
+) else if errorlevel 3 (
   set "CHANGE_TYPE=delete"
 ) else if errorlevel 2 (
   set "CHANGE_TYPE=add"
@@ -28,15 +49,28 @@ if errorlevel 3 (
   set "CHANGE_TYPE=edit"
 )
 
-if /I "%CHANGE_TYPE%"=="delete" (
+if /I "%CHANGE_TYPE%"=="delete" goto :deletion_reminder
+if /I "%CHANGE_TYPE%"=="mixed" goto :deletion_reminder_done
+goto :deletion_reminder_done
+
+:deletion_reminder
+echo.
+echo Safe deletion reminder:
+echo Keep the styled question heading as an empty draft.
+echo Remove the question text, the separate solution marker, and the solution.
+echo Do not physically remove a middle heading unless a technical maintainer
+echo has checked the resulting renumbering and question-specific figures.
+echo.
+pause
+
+:deletion_reminder_done
+if /I "%CHANGE_TYPE%"=="mixed" (
   echo.
-  echo Safe deletion reminder:
-  echo Keep the styled question heading as an empty draft.
-  echo Remove the question text, the separate solution marker, and the solution.
-  echo Do not physically remove a middle heading unless a technical maintainer
-  echo has checked the resulting renumbering and question-specific figures.
+  echo Mixed mode selected. The change summary will list every edited, added,
+  echo removed, and possibly renumbered public question.
+  echo If the mixed changes include a deletion, keep the old numbered heading
+  echo as an empty draft so later questions are not renumbered accidentally.
   echo.
-  pause
 )
 
 where py >nul 2>&1
@@ -106,7 +140,6 @@ echo The original docs folder was kept unchanged until validation passed.
 echo Check the change summary and every affected question before publishing.
 echo ============================================================
 start "" "%PROJECT_DIR%docs\index.html"
-pause
 exit /b 0
 
 :missing_word
@@ -140,5 +173,4 @@ if defined STAGING_ROOT echo Technical files remain in: %STAGING_ROOT%
 echo Do not publish. Copy the complete error message for technical support.
 
 :failed_end
-pause
 exit /b 1

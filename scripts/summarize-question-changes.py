@@ -47,7 +47,7 @@ def format_numbers(values: list[str]) -> str:
 parser = argparse.ArgumentParser()
 parser.add_argument("--before", type=Path, required=True)
 parser.add_argument("--after", type=Path, required=True)
-parser.add_argument("--operation", choices=["edit", "add", "delete"], required=True)
+parser.add_argument("--operation", choices=["edit", "add", "delete", "mixed"], required=True)
 args = parser.parse_args()
 
 before = load_book(args.before)
@@ -90,15 +90,26 @@ if moved:
     print("Inspect every shifted question, title, solution, and image before publishing.")
 
 operation_mismatch = False
-if args.operation == "edit" and (added or removed):
-    operation_mismatch = True
-    print("ERROR: You selected EDIT, but public question numbers were added or removed.")
-elif args.operation == "add" and not added:
-    operation_mismatch = True
-    print("ERROR: You selected ADD, but no new public question number was detected.")
-elif args.operation == "delete" and not removed:
-    operation_mismatch = True
-    print("ERROR: You selected DELETE, but no public question number was removed.")
+if args.operation == "edit":
+    if added or removed:
+        operation_mismatch = True
+        print("ERROR: You selected EDIT ONLY, but public question numbers were added or removed.")
+elif args.operation == "add":
+    if not added:
+        operation_mismatch = True
+        print("ERROR: You selected ADD ONLY, but no new public question number was detected.")
+    elif removed or changed:
+        operation_mismatch = True
+        print("ERROR: You selected ADD ONLY, but edits or deletions were also detected.")
+elif args.operation == "delete":
+    if not removed:
+        operation_mismatch = True
+        print("ERROR: You selected DELETE ONLY, but no public question number was removed.")
+    elif added or changed:
+        operation_mismatch = True
+        print("ERROR: You selected DELETE ONLY, but additions or edits were also detected.")
+# Mixed mode intentionally accepts any combination. The detailed summary above
+# remains the review gate and the full site validator still runs afterwards.
 
 if operation_mismatch:
     print("The staged build was stopped so the existing docs folder stays unchanged.")
