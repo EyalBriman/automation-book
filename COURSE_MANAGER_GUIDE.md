@@ -31,7 +31,8 @@ This handoff ZIP deliberately contains two different states:
 
 - `docs/` is the 77-question starting website.
 - `private-source/Automation_book_current.docx` is the current Word source and
-  already contains question 2.2.5.
+  already contains questions 2.2.5 and 5.6.1, the corrected 3.2.2 solution,
+  and no empty section 3.3.
 
 This difference is intentional: it tests whether the Windows helper really
 converts the current Word file and updates the website.
@@ -43,20 +44,24 @@ converts the current Word file and updates the website.
 
    ```text
    Before: 77 public questions
-   After:  78 public questions
-   Added public numbers:   2.2.5
+   After:  79 public questions
+   Added public numbers:   2.2.5, 5.6.1
    Removed public numbers: none
-   Changed public numbers: 1.2.2, 1.2.3, 1.2.4, 1.3.2, 1.3.3, 1.3.4
+   Changed public numbers: 1.2.2, 1.2.3, 1.2.4, 1.3.2, 1.3.3, 1.3.4, 3.2.2
    ```
 
 5. Wait for `BUILD AND VALIDATION SUCCEEDED`.
 6. Inspect 2.2.5 in the website that opens and confirm that both the question
    and its solution use the complete Hebrew sequence א–ד. The condition lines
    inside answer א must be bullets and must not restart א, ב, ג.
+7. Inspect 5.6.1 and confirm that it contains parts א–ג, a solution after each
+   part, numbered Arduino code, and the wiring diagram in solution ג.
+8. Confirm that section 3.3 (מאפיינים) and all completion-status badges are
+   absent.
 
 Do not run the Bash publishing command before this test succeeds. Before the
 BAT runs, `docs/` is only the 77-question test baseline. After the successful
-BAT run, the same local folder contains the validated 78-question website and
+BAT run, the same local folder contains the validated 79-question website and
 is ready to publish.
 
 ## Editing an existing question
@@ -177,8 +182,8 @@ fixed image, and cross-reference in the section must then be checked.
 ## Draft questions
 
 A question heading without a recognized solution paragraph is treated as a
-draft and is not published. Empty draft headings are used both for planned
-questions and for safely removing a question without renumbering later content.
+draft and is not published. Empty draft headings can reserve a future question
+number or safely remove a question without renumbering later content.
 
 To publish a draft later, add real question content, a separate `פתרון`
 paragraph, and the solution. It will be included in the next successful build.

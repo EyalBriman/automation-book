@@ -1,14 +1,11 @@
 window.BOOK_DATA = {
   "source": "private Word source (included only in the local handoff ZIP; ignored by Git)",
   "build": "semantic-word-structure-v1-pandoc-word-drawings-rtl",
-  "notes": "Questions are discovered from the canonical Word hierarchy. Sections without a complete question and solution remain planned. Section 4.8 is intentionally excluded from publication.",
+  "notes": "Questions are discovered from the canonical Word hierarchy. Only sections containing complete published questions are shown. Section 4.8 is intentionally excluded from publication.",
   "structure": {
-    "discoveredQuestions": 80,
-    "publishedQuestions": 78,
-    "draftQuestions": [
-      "3.3.1",
-      "3.3.2"
-    ],
+    "discoveredQuestions": 79,
+    "publishedQuestions": 79,
+    "draftQuestions": [],
     "excludedSections": [
       "4.8"
     ]
@@ -18,42 +15,34 @@ window.BOOK_DATA = {
       "number": "1",
       "id": "chapter-1",
       "title": "מודלים ובקרה",
-      "status": "implemented",
       "sections": [
         {
           "id": "1.1",
-          "title": "מודלים ומערכות מכניות וחשמליות",
-          "status": "implemented"
+          "title": "מודלים ומערכות מכניות וחשמליות"
         },
         {
           "id": "1.2",
-          "title": "פתרון משוואות דיפרנציאליות",
-          "status": "implemented"
+          "title": "פתרון משוואות דיפרנציאליות"
         },
         {
           "id": "1.3",
-          "title": "התמרת לפלס ותמסורת",
-          "status": "implemented"
+          "title": "התמרת לפלס ותמסורת"
         },
         {
           "id": "1.4",
-          "title": "מרחב המצבים",
-          "status": "implemented"
+          "title": "מרחב המצבים"
         },
         {
           "id": "1.5",
-          "title": "תכונות של מערכות",
-          "status": "implemented"
+          "title": "תכונות של מערכות"
         },
         {
           "id": "1.6",
-          "title": "בקרי P, PI, PD",
-          "status": "implemented"
+          "title": "בקרי P, PI, PD"
         },
         {
           "id": "1.7",
-          "title": "שאלות חזרה",
-          "status": "implemented"
+          "title": "שאלות חזרה"
         }
       ]
     },
@@ -61,17 +50,14 @@ window.BOOK_DATA = {
       "number": "2",
       "id": "chapter-2",
       "title": "לוגיקה ובקרים מתוכנתים",
-      "status": "implemented",
       "sections": [
         {
           "id": "2.1",
-          "title": "לוגיקה",
-          "status": "implemented"
+          "title": "לוגיקה"
         },
         {
           "id": "2.2",
-          "title": "בקרים",
-          "status": "implemented"
+          "title": "בקרים"
         }
       ]
     },
@@ -79,22 +65,14 @@ window.BOOK_DATA = {
       "number": "3",
       "id": "chapter-3",
       "title": "עיבוד תמונה",
-      "status": "partial",
       "sections": [
         {
           "id": "3.1",
-          "title": "סינון",
-          "status": "implemented"
+          "title": "סינון"
         },
         {
           "id": "3.2",
-          "title": "סגמנטציה",
-          "status": "implemented"
-        },
-        {
-          "id": "3.3",
-          "title": "מאפיינים",
-          "status": "planned"
+          "title": "סגמנטציה"
         }
       ]
     },
@@ -102,42 +80,34 @@ window.BOOK_DATA = {
       "number": "4",
       "id": "chapter-4",
       "title": "חיישנים ומפעילים",
-      "status": "implemented",
       "sections": [
         {
           "id": "4.1",
-          "title": "מערכות מדידה",
-          "status": "implemented"
+          "title": "מערכות מדידה"
         },
         {
           "id": "4.2",
-          "title": "מאפייני חיישנים ומערכות מדידה",
-          "status": "implemented"
+          "title": "מאפייני חיישנים ומערכות מדידה"
         },
         {
           "id": "4.3",
-          "title": "אותות ונתונים",
-          "status": "implemented"
+          "title": "אותות ונתונים"
         },
         {
           "id": "4.4",
-          "title": "כיול חיישנים",
-          "status": "implemented"
+          "title": "כיול חיישנים"
         },
         {
           "id": "4.5",
-          "title": "בקרת מנועים באמצעות PWM",
-          "status": "implemented"
+          "title": "בקרת מנועים באמצעות PWM"
         },
         {
           "id": "4.6",
-          "title": "מפעילים ומנועים",
-          "status": "implemented"
+          "title": "מפעילים ומנועים"
         },
         {
           "id": "4.7",
-          "title": "אנקודרים",
-          "status": "implemented"
+          "title": "אנקודרים"
         }
       ]
     },
@@ -145,32 +115,30 @@ window.BOOK_DATA = {
       "number": "5",
       "id": "chapter-5",
       "title": "ארדואינו",
-      "status": "implemented",
       "sections": [
         {
           "id": "5.1",
-          "title": "מועד א׳ 2026 סמסטר א",
-          "status": "implemented"
+          "title": "מועד א׳ 2026 סמסטר א"
         },
         {
           "id": "5.2",
-          "title": "מועד א׳ 2025 סמסטר ב",
-          "status": "implemented"
+          "title": "מועד א׳ 2025 סמסטר ב"
         },
         {
           "id": "5.3",
-          "title": "מועד א׳ 2025 סמסטר א",
-          "status": "implemented"
+          "title": "מועד א׳ 2025 סמסטר א"
         },
         {
           "id": "5.4",
-          "title": "מועד א׳ 2024 סמסטר ב",
-          "status": "implemented"
+          "title": "מועד א׳ 2024 סמסטר ב"
         },
         {
           "id": "5.5",
-          "title": "מועד א׳ 2024 סמסטר א",
-          "status": "implemented"
+          "title": "מועד א׳ 2024 סמסטר א"
+        },
+        {
+          "id": "5.6",
+          "title": "מועד ב' 2026 סמסטר א"
         }
       ]
     }
@@ -856,7 +824,7 @@ window.BOOK_DATA = {
       "section": "3.2",
       "title": "סגמנטציית קוביות בעזרת K-means",
       "questionHtml": "<p dir=\"rtl\"><span dir=\"rtl\">סגמנטציה בעזרת</span> <span class=\"ltr-inline\" dir=\"ltr\">K-means</span></p>\n<p dir=\"rtl\"><span dir=\"rtl\">נתונה תמונה וייצוג של תמונה במחשב</span>: <span dir=\"rtl\"></span></p>\n<figure class=\"word-diagram matrix-figure\" dir=\"ltr\"><img alt=\"מטריצה עבור שאלה 3.2.2\" decoding=\"sync\" dir=\"ltr\" height=\"322\" loading=\"eager\" src=\"media/matrix-3-2-2-question-1.png\" width=\"412\"/></figure>\n<p dir=\"rtl\"><img decoding=\"sync\" dir=\"ltr\" height=\"296\" loading=\"eager\" src=\"media/image39.png\" style=\"width:1.25984in;\" width=\"291\"/></p>\n<ol class=\"word-list-hebrew\">\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">(4 נקודות) שד ירוק עבר, עשה בלגן וסובב תמונות להנאתו. כאשר מידע זה בידיכם, האם הייצוג הנתון הוא כנראה של התמונה הנתונה ואם כן, ציינו האם וכיצד סובב השד את התמונה.</span></p></li>\n</ol>\n<p dir=\"rtl\"><span dir=\"rtl\">בהמשך השאלה נניח כי הייצוג הנתון אכן הינו הייצוג של התמונה הנתונה</span></p>\n<ol class=\"word-list-hebrew\" start=\"2\">\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">(7 נקודות)</span> <span dir=\"rtl\">התמונה הינה תמונה של שתי קוביות המונחות על שולחן. עבור זיהוי של כל אחת מהקוביות שיבוצע בהמשך בצעו סגמנטציה בעזרת אלגוריתם</span> <span class=\"ltr-inline\" dir=\"ltr\">k-means</span><span dir=\"rtl\">. הדגימו את החישוב ואת התוצאה הסופית של הסגמנטציה.</span></p></li>\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">(4 נקודות)</span> <span dir=\"rtl\">חשבו את מרכז הכובד של כל אחת מהקוביות.</span></p></li>\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">(6 נקודות)</span> <span dir=\"rtl\">השד העביר ייצוג נוסף של תמונה של הקוביות ועליכם שוב לבצע סגמנטציה לקראת זיהוי. האם ניתן גם כעת לבצע את הסגמנטציה עם אלגוריתם</span> <span class=\"ltr-inline\" dir=\"ltr\">k-means</span> <span dir=\"rtl\">? הסבירו. במידה וניתן בצעו את שלב האיתחול (אין צורך לבצע את המשך האלגוריתם).</span></p></li>\n</ol>\n<figure class=\"word-diagram matrix-figure\" dir=\"ltr\"><img alt=\"מטריצה עבור שאלה 3.2.2\" decoding=\"sync\" dir=\"ltr\" height=\"322\" loading=\"eager\" src=\"media/matrix-3-2-2-question-2.png\" width=\"412\"/></figure>",
-      "solutionHtml": "<ol class=\"word-list-hebrew\">\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">מדובר באותה תמונה. השד סובב אותה 90 מעלות עם כיוון השעון</span></p></li>\n</ol>\n<p dir=\"rtl\"><span dir=\"rtl\">ניתן לראות כי בתמונה ישנו חלק שחור, חלק אפור וחלקים לבנים. בייצוג המספרי כל אחד מהחלקים זז 90 מעלות ימינה ועל כן השד סובב את התמונה 90 מעלות ימינה (יש לשים לב ש 0,3,4,2 הוא החלק השחור ו 14,17,15,18 הוא החלק האפור—אלו הן שתי הקוביות וניתן להבחין בינהן!)</span></p>\n<ol class=\"word-list-hebrew\" start=\"2\">\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">כדי להבחין בין שתי הקוביות לבין הרקע נצטרך לעשות סגמנטציה ל-3 קבוצות.</span></p></li>\n</ol>\n<blockquote dir=\"rtl\">\n<p dir=\"rtl\"><span dir=\"rtl\">נאתחל ממוצעים התחלתיים כרצוננו:</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C1= 3</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C2= 30</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C3=16</span></p>\n<p dir=\"rtl\"><span dir=\"rtl\">איטרציה ראשונה:</span></p>\n</blockquote>\n<figure class=\"word-diagram matrix-figure\" dir=\"ltr\"><img alt=\"מטריצה עבור שאלה 3.2.2\" decoding=\"sync\" dir=\"ltr\" height=\"322\" loading=\"eager\" src=\"media/matrix-3-2-2-solution-1.png\" width=\"412\"/></figure>\n<blockquote dir=\"rtl\">\n<p dir=\"rtl\"><span dir=\"rtl\">כעת המרכזים יהיו</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span dir=\"rtl\"></span><span class=\"ltr-inline\" dir=\"ltr\">C1= 2.25</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C2= 29.75</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C3=16</span></p>\n<p dir=\"rtl\"><span dir=\"rtl\">איטרציה שניה ללא שינוי. כלומר הסגמנטציה הינה</span></p>\n</blockquote>\n<figure class=\"word-diagram matrix-figure\" dir=\"ltr\"><img alt=\"מטריצה עבור שאלה 3.2.2\" decoding=\"sync\" dir=\"ltr\" height=\"322\" loading=\"eager\" src=\"media/matrix-3-2-2-solution-2.png\" width=\"412\"/></figure>\n<ol class=\"word-list-hebrew\" start=\"3\">\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">ניתן לראות (מכיוון שהצורת סימטריות) שמרכז הכובד לקוביה העליונה ימצא ב 1.5,1.5 ועבור הקובייה התחתונה ב 4.5,4.5.</span></p></li>\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">אפשר להפריד בעזרת</span> <span class=\"ltr-inline\" dir=\"ltr\">k-means</span> <span dir=\"rtl\">אולם כעת נדרש וקטור מרכזים שכולל גם בהיקות וגם מיקום. למשל מספיק קואורדינטת</span> <span class=\"ltr-inline\" dir=\"ltr\">X</span> <span dir=\"rtl\">ורמת אפור. לדוגמה ניתן להתחיל מוקטור מרכזים -</span></p></li>\n</ol>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">X1</span>=[1,10], <span class=\"ltr-inline\" dir=\"ltr\">X2</span>=[4,10]</p>",
+      "solutionHtml": "<ol class=\"word-list-hebrew\">\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">מדובר באותה תמונה. השד סובב אותה 90 מעלות עם כיוון השעון</span></p></li>\n</ol>\n<p dir=\"rtl\"><span dir=\"rtl\">ניתן לראות כי בתמונה ישנו חלק שחור, חלק אפור וחלקים לבנים. בייצוג המספרי כל אחד מהחלקים זז 90 מעלות ימינה ועל כן השד סובב את התמונה 90 מעלות ימינה (יש לשים לב ש 0,3,4,2 הוא החלק השחור ו 14,17,15,18 הוא החלק האפור—אלו הן שתי הקוביות וניתן להבחין בינהן!)</span></p>\n<ol class=\"word-list-hebrew\" start=\"2\">\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">כדי להבחין בין שתי הקוביות לבין הרקע נצטרך לעשות סגמנטציה ל-3 קבוצות.</span></p></li>\n</ol>\n<blockquote dir=\"rtl\">\n<p dir=\"rtl\">נאתחל ממוצעים התחלתיים לפי הממוצע של כל קבוצה בתמונה:</p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C1= 2.25</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C2= 29.75</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C3=16</span></p>\n<p dir=\"rtl\"><span dir=\"rtl\">איטרציה ראשונה:</span></p>\n</blockquote>\n<figure class=\"word-diagram matrix-figure\" dir=\"ltr\"><img alt=\"מטריצה עבור שאלה 3.2.2\" decoding=\"sync\" dir=\"ltr\" height=\"322\" loading=\"eager\" src=\"media/matrix-3-2-2-solution-1.png\" width=\"412\"/></figure>\n<blockquote dir=\"rtl\">\n<p dir=\"rtl\"><span dir=\"rtl\">כעת המרכזים יהיו</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span dir=\"rtl\"></span><span class=\"ltr-inline\" dir=\"ltr\">C1= 2.25</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C2= 29.75</span></p>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">C3=16</span></p>\n<p dir=\"rtl\"><span dir=\"rtl\">איטרציה שניה ללא שינוי. כלומר הסגמנטציה הינה</span></p>\n</blockquote>\n<figure class=\"word-diagram matrix-figure\" dir=\"ltr\"><img alt=\"מטריצה עבור שאלה 3.2.2\" decoding=\"sync\" dir=\"ltr\" height=\"322\" loading=\"eager\" src=\"media/matrix-3-2-2-solution-2.png\" width=\"412\"/></figure>\n<ol class=\"word-list-hebrew\" start=\"3\">\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">ניתן לראות (מכיוון שהצורת סימטריות) שמרכז הכובד לקוביה העליונה ימצא ב 1.5,1.5 ועבור הקובייה התחתונה ב 4.5,4.5.</span></p></li>\n<li dir=\"rtl\"><p dir=\"rtl\"><span dir=\"rtl\">אפשר להפריד בעזרת</span> <span class=\"ltr-inline\" dir=\"ltr\">k-means</span> <span dir=\"rtl\">אולם כעת נדרש וקטור מרכזים שכולל גם בהיקות וגם מיקום. למשל מספיק קואורדינטת</span> <span class=\"ltr-inline\" dir=\"ltr\">X</span> <span dir=\"rtl\">ורמת אפור. לדוגמה ניתן להתחיל מוקטור מרכזים -</span></p></li>\n</ol>\n<p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">X1</span>=[1,10], <span class=\"ltr-inline\" dir=\"ltr\">X2</span>=[4,10]</p>",
       "partLabelScheme": "hebrew",
       "partLabels": [
         "א",
@@ -1180,6 +1148,33 @@ window.BOOK_DATA = {
           "title": "חיבור הרכיבים",
           "questionHtml": "<p dir=\"rtl\"><span dir=\"rtl\">(10) בעזרת השרטוט הסכמטי של הבקר, שרטטו כיצד תחברו את הרכיבים כך שמהערכת אכן תפעל כנדרש.</span></p>",
           "solutionHtml": "<p dir=\"rtl\"><span dir=\"rtl\"><br/>\nלכפתור יש שלוש רגלים – למתח, ל</span><em><span class=\"ltr-inline\" dir=\"ltr\">GND</span></em> <span dir=\"rtl\">ולכניסת האות. את הנגש יש להוסיף למניעת קצר בין הכפתור לבין</span> <em><span class=\"ltr-inline\" dir=\"ltr\">GND</span></em></p>\n<blockquote dir=\"rtl\">\n</blockquote><figure class=\"word-diagram\" dir=\"ltr\"><img alt=\"חיבור שלוש רגלי הכפתור לכניסת הבקר, לאדמה ולמתח\" decoding=\"sync\" dir=\"ltr\" height=\"393\" loading=\"eager\" src=\"media/word-fixed-5-5-button.png\" width=\"517\"/></figure><figure class=\"word-diagram\" dir=\"ltr\"><img alt=\"חיבור ארדואינו, מקור מתח, נורת לד, נגד וכפתור\" decoding=\"sync\" dir=\"ltr\" height=\"571\" loading=\"eager\" src=\"media/word-fixed-5-5-circuit.png\" width=\"976\"/></figure>"
+        }
+      ]
+    },
+    {
+      "id": "5-6-1",
+      "number": "5.6.1",
+      "section": "5.6",
+      "title": "מועד ב' 2026 סמסטר א",
+      "questionHtml": "<p dir=\"rtl\">מערכת כוללת ארדואינו אונו, כפתור קפיצי, לד, נגדים ככל שנדרש והקוד הנתון. המערכת חוברה כך שמוצא כפתור שאינו לחוץ הוא <span class=\"ltr-inline\" dir=\"ltr\">HIGH</span> (ומוצא כפתור לחוץ הוא <span class=\"ltr-inline\" dir=\"ltr\">LOW</span>).</p>\n<ol class=\"word-code\" dir=\"ltr\" type=\"1\">\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">const</span> <span class=\"ltr-inline\" dir=\"ltr\">int</span> <span class=\"ltr-inline\" dir=\"ltr\">buttonPin = 2</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">const</span> <span class=\"ltr-inline\" dir=\"ltr\">int</span> <span class=\"ltr-inline\" dir=\"ltr\">pwmPin = 9</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">int</span> <span class=\"ltr-inline\" dir=\"ltr\">brightness = 0</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">bool</span> <span class=\"ltr-inline\" dir=\"ltr\">increasing = true</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">bool</span> <span class=\"ltr-inline\" dir=\"ltr\">buttonPressed = false</span>;</p></li>\n<li dir=\"rtl\"></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">void</span> <span class=\"ltr-inline\" dir=\"ltr\">setup()</span> {</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">pinMode(pwmPin, OUTPUT)</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">pinMode(buttonPin, INPUT)</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\">}</p></li>\n<li dir=\"rtl\"></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">void</span> <span class=\"ltr-inline\" dir=\"ltr\">loop()</span> {</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">bool</span> <span class=\"ltr-inline\" dir=\"ltr\">currentButtonState = digitalRead(buttonPin)</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">if</span> (<span class=\"ltr-inline\" dir=\"ltr\">currentButtonState</span> == <span class=\"ltr-inline\" dir=\"ltr\">LOW</span> &amp;&amp; !<span class=\"ltr-inline\" dir=\"ltr\">buttonPressed</span>) {</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">buttonPressed = true</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">increasing</span> = !<span class=\"ltr-inline\" dir=\"ltr\">increasing</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\">} <span class=\"ltr-inline\" dir=\"ltr\">else</span> <span class=\"ltr-inline\" dir=\"ltr\">if</span> (<span class=\"ltr-inline\" dir=\"ltr\">currentButtonState</span> == <span class=\"ltr-inline\" dir=\"ltr\">HIGH</span>) {</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">buttonPressed = false</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\">}</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">if</span> (<span class=\"ltr-inline\" dir=\"ltr\">increasing</span>) {</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">brightness</span> += 5;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">if</span> (<span class=\"ltr-inline\" dir=\"ltr\">brightness &gt; 255)</span> <span class=\"ltr-inline\" dir=\"ltr\">brightness = 255</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\">} <span class=\"ltr-inline\" dir=\"ltr\">else</span> {</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">brightness</span> -= 5;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">if</span> (<span class=\"ltr-inline\" dir=\"ltr\">brightness &lt; 0)</span> <span class=\"ltr-inline\" dir=\"ltr\">brightness = 0</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\">}</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">analogWrite(pwmPin, brightness)</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\"><span class=\"ltr-inline\" dir=\"ltr\">delay(30)</span>;</p></li>\n<li dir=\"rtl\"><p class=\"formula-line\" dir=\"ltr\">}</p></li>\n</ol>",
+      "parts": [
+        {
+          "label": "א",
+          "title": "הסבירו מה עושה המערכת. פרטו כיצד פועל הקוד. בפרט ציינו מה תפקיד שורות 22…",
+          "questionHtml": "<p dir=\"rtl\">הסבירו מה עושה המערכת. פרטו כיצד פועל הקוד. בפרט ציינו מה תפקיד שורות 22, 25 ו-28.</p>",
+          "solutionHtml": "<p dir=\"rtl\">המערכת משנה את בהירות ה-<span class=\"ltr-inline\" dir=\"ltr\">LED</span> בהדרגה באמצעות <span class=\"ltr-inline\" dir=\"ltr\">PWM</span>, וכאשר לוחצים על הכפתור כיוון השינוי מתהפך (עלייה או ירידה). הקוד מזהה לחיצה אחת בכל פעם ומשנה את המשתנה <span class=\"ltr-inline\" dir=\"ltr\">brightness</span> בהתאם. שורה 22 מגבילה את הבהירות ל-255, שורה 25 מגבילה אותה ל-0, ושורה 28 מוסיפה השהיה כדי לרכך את השינוי ולאפשר זיהוי לחיצות יציב.</p>"
+        },
+        {
+          "label": "ב",
+          "title": "הלקוח ביקש לשנות את המערכת כך שמוצא כפתור לחוץ יהיה HIGH (וכפתור שאינו…",
+          "questionHtml": "<p dir=\"rtl\">הלקוח ביקש לשנות את המערכת כך שמוצא כפתור לחוץ יהיה <span class=\"ltr-inline\" dir=\"ltr\">HIGH</span> (וכפתור שאינו לחוץ יהיה <span class=\"ltr-inline\" dir=\"ltr\">LOW</span>). אם יש לשנות את הקוד, ציינו כיצד והקפידו לציין מספרי שורה.</p>",
+          "solutionHtml": "<p dir=\"rtl\">כיוון שהלוגיקה התהפכה (כפתור לחוץ = <span class=\"ltr-inline\" dir=\"ltr\">HIGH</span>), יש לשנות את שורות 14 ו-17 המתייחסות למצב הכפתור:</p>\n<p class=\"formula-line\" dir=\"ltr\">14. <span class=\"ltr-inline\" dir=\"ltr\">if</span> (<span class=\"ltr-inline\" dir=\"ltr\">currentButtonState</span> == <span class=\"ltr-inline\" dir=\"ltr\">HIGH</span> &amp;&amp; !<span class=\"ltr-inline\" dir=\"ltr\">buttonPressed</span>) {</p>\n<p class=\"formula-line\" dir=\"ltr\">15. <span class=\"ltr-inline\" dir=\"ltr\">buttonPressed = true</span>;</p>\n<p class=\"formula-line\" dir=\"ltr\">16. <span class=\"ltr-inline\" dir=\"ltr\">increasing</span> = !<span class=\"ltr-inline\" dir=\"ltr\">increasing</span>;</p>\n<p class=\"formula-line\" dir=\"ltr\">17. } <span class=\"ltr-inline\" dir=\"ltr\">else</span> <span class=\"ltr-inline\" dir=\"ltr\">if</span> (<span class=\"ltr-inline\" dir=\"ltr\">currentButtonState</span> == <span class=\"ltr-inline\" dir=\"ltr\">LOW</span>) {</p>"
+        },
+        {
+          "label": "ג",
+          "title": "בעזרת השרטוט הסכמטי של הבקר, שרטטו כיצד יש לחבר את רכיבי המערכת באופן…",
+          "questionHtml": "<p dir=\"rtl\">בעזרת השרטוט הסכמטי של הבקר, שרטטו כיצד יש לחבר את רכיבי המערכת באופן שמתאים גם לבקשת הלקוח בסעיף ב'.</p>",
+          "solutionHtml": "<p dir=\"rtl\">החיבור המתאים מוצג בשרטוט:</p>\n<p dir=\"rtl\"><img decoding=\"sync\" dir=\"ltr\" height=\"700\" loading=\"eager\" src=\"media/image59.png\" style=\"width:6.2in;\" width=\"850\"/></p>"
         }
       ]
     }

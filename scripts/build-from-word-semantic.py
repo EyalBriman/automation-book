@@ -761,15 +761,14 @@ def semantic_structure(source: Path, marked_output: Path) -> Structure:
         for section in sections:
             if section.chapter != chapter["number"] or section.id in EXCLUDED_PUBLIC_SECTIONS:
                 continue
-            status = "implemented" if published_by_section[section.id] else "planned"
-            chapter_sections.append({"id": section.id, "title": section.title, "status": status})
-        chapter_status = "partial" if any(item["status"] == "planned" for item in chapter_sections) else "implemented"
+            if not published_by_section[section.id]:
+                continue
+            chapter_sections.append({"id": section.id, "title": section.title})
         chapter_data.append(
             {
                 "number": chapter["number"],
                 "id": f"chapter-{chapter['number']}",
                 "title": chapter["title"],
-                "status": chapter_status,
                 "sections": chapter_sections,
             }
         )
@@ -1083,7 +1082,7 @@ def build_data(
         "build": "semantic-word-structure-v1-pandoc-word-drawings-rtl",
         "notes": (
             "Questions are discovered from the canonical Word hierarchy. "
-            "Sections without a complete question and solution remain planned. "
+            "Only sections containing complete published questions are shown. "
             "Section 4.8 is intentionally excluded from publication."
         ),
         "structure": {

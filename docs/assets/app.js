@@ -7,12 +7,12 @@
     return window.BOOK_DATA.exercises || [];
   }
 
-  function implementedSections() {
+  function availableSections() {
     return [...new Set(allExercises().map(e => e.section))];
   }
 
   function defaultSection() {
-    return implementedSections()[0] || 'all';
+    return availableSections()[0] || 'all';
   }
 
   function sectionTitle(id) {
@@ -47,7 +47,7 @@
   }
 
   function setCurrentSection(sectionId, options = {}) {
-    const available = implementedSections();
+    const available = availableSections();
     if (!sectionId || !available.includes(sectionId)) {
       sectionId = defaultSection();
     }
@@ -64,14 +64,14 @@
   function renderPlan() {
     const grid = document.getElementById('plan-grid');
     grid.innerHTML = '';
+    const available = new Set(availableSections());
     for (const chapter of window.BOOK_DATA.chapters) {
       const card = document.createElement('article');
       card.className = 'plan-card';
-      const badgeText = chapter.status === 'implemented' ? 'ממומש' : chapter.status === 'partial' ? 'חלקי' : 'שלד';
-      const badgeClass = chapter.status === 'implemented' ? 'badge' : 'badge badge-muted';
+      const sections = (chapter.sections || []).filter(section => available.has(section.id));
       card.innerHTML = `
-        <h3>פרק ${chapter.number} ${chapter.title} <span class="${badgeClass}">${badgeText}</span></h3>
-        <ul>${(chapter.sections || []).map(s => `<li>${s.id} ${s.title}${s.comingSoon ? ' <span class="badge badge-muted">בעבודה</span>' : ''}</li>`).join('')}</ul>
+        <h3>פרק ${chapter.number} ${chapter.title}</h3>
+        <ul>${sections.map(s => `<li>${s.id} ${s.title}</li>`).join('')}</ul>
       `;
       grid.appendChild(card);
     }
@@ -102,10 +102,6 @@
         const isActive = section.id === activeSection;
 
         if (!hasExercises) {
-          const div = document.createElement('div');
-          div.className = 'nav-coming';
-          div.textContent = `${section.id} ${section.title}${section.comingSoon ? ' · בעבודה' : ''}`;
-          chapterContent.appendChild(div);
           continue;
         }
 
@@ -141,7 +137,7 @@
 
   function renderFilter() {
     const select = document.getElementById('section-filter');
-    const sections = implementedSections();
+    const sections = availableSections();
     select.innerHTML = sections.map(id => `<option value="${id}">${sectionTitle(id)}</option>`).join('');
     select.addEventListener('change', () => setCurrentSection(select.value, { updateHash: true }));
   }

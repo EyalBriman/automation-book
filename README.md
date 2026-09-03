@@ -11,7 +11,7 @@ can instead be dragged onto the helper.
 
 For the included BAT test, `docs/` intentionally contains the 77-question
 starting website. It is not the final publishable version yet. Run the Windows
-helper successfully first; it will generate the 78-question website from the
+helper successfully first; it will generate the 79-question website from the
 included Word source.
 
 The current importer discovers chapters, sections, questions, and solutions
@@ -41,15 +41,17 @@ Word-to-website workflow instead of receiving a site that was already built.
 
 1. Double-click `BUILD_SITE_WINDOWS.bat`.
 2. Wait for the complete rebuild and the change summary.
-3. The summary should say `Added public numbers: 2.2.5` and no removed public
-   numbers. It also reports 1.2.2–1.2.4 and 1.3.2–1.3.4 as changed because this
-   build corrects their solution labels from Hebrew letters to the numeric
-   scheme used by their Word questions.
+3. The summary should say `Added public numbers: 2.2.5, 5.6.1` and no removed
+   public numbers. It reports 3.2.2 as changed because its K-means
+   initialization was corrected. It also reports 1.2.2–1.2.4 and
+   1.3.2–1.3.4 as changed because this build corrects their solution labels
+   from Hebrew letters to the numeric scheme used by their Word questions.
 4. Continue only if the window ends with `BUILD AND VALIDATION SUCCEEDED` and
-   the opened website contains 2.2.5 with Hebrew parts א–ד. In its solution,
+   the opened website contains 2.2.5 with Hebrew parts א–ד and 5.6.1 with
+   Hebrew parts א–ג. In the 2.2.5 solution,
    the condition lines inside answer א must be bullets, not another א–ד list.
 
-After this test succeeds, the local `docs/` folder contains 78 questions and
+After this test succeeds, the local `docs/` folder contains 79 questions and
 is ready to publish. Running the BAT again simply rebuilds and validates the
 complete site again.
 
@@ -143,10 +145,14 @@ building, checking, and publication procedure.
 
 ## Current publication rules
 
-- After the included BAT test succeeds, the September 2026 build publishes 78
-  questions, including question 2.2.5 and the mean-shift question 3.2.3.
-- The two empty question headings in section 3.3 remain drafts until they have
-  complete question and solution content.
+- After the included BAT test succeeds, the September 2026 build publishes 79
+  questions, including questions 2.2.5 and 5.6.1 and the mean-shift question
+  3.2.3.
+- Question 3.2.2 contains the corrected K-means initialization from the 2026
+  exam solution.
+- Empty section 3.3 (מאפיינים) has been removed from Word and from the website.
+- The website shows only chapters and sections containing published questions;
+  it does not display completion-status badges.
 - Section 4.8 is intentionally excluded from publication.
-- Duplicate exam headings in chapter 5 are published sequentially as sections
-  5.1 through 5.5.
+- Exam headings in chapter 5 are published sequentially as sections 5.1
+  through 5.6.

@@ -116,6 +116,7 @@ expected_part_counts = {
     "5.3.1": 3,
     "5.4.1": 3,
     "5.5.1": 3,
+    "5.6.1": 3,
 }
 
 for exercise in exercises:
@@ -268,9 +269,9 @@ if "word-drawings" not in data.get("build", ""):
     errors.append("Build metadata does not identify the Word-drawing renderer")
 
 chapters = data.get("chapters", [])
-chapter_status = {chapter.get("number"): chapter.get("status") for chapter in chapters}
-if set(chapter_status) != set("12345"):
-    errors.append(f"Expected chapters 1–5, found: {sorted(chapter_status)}")
+chapter_numbers = {chapter.get("number") for chapter in chapters}
+if chapter_numbers != set("12345"):
+    errors.append(f"Expected chapters 1–5, found: {sorted(chapter_numbers)}")
 
 known_sections = {
     section.get("id")
@@ -284,15 +285,11 @@ for exercise in exercises:
         )
 
 for chapter in chapters:
-    section_statuses = [section.get("status") for section in chapter.get("sections", [])]
-    if any(status not in {"implemented", "planned"} for status in section_statuses):
-        errors.append(f"Chapter {chapter.get('number')} has an invalid section status")
-    expected_status = "partial" if "planned" in section_statuses else "implemented"
-    if chapter.get("status") != expected_status:
-        errors.append(
-            f"Chapter {chapter.get('number')} status should be {expected_status}, "
-            f"not {chapter.get('status')}"
-        )
+    if "status" in chapter:
+        errors.append(f"Chapter {chapter.get('number')} still exposes a completion status")
+    for section in chapter.get("sections", []):
+        if "status" in section or "comingSoon" in section:
+            errors.append(f"Section {section.get('id')} still exposes an unfinished status")
 
 if raw.count("word-code") < 5:
     errors.append("Arduino code blocks were not consistently marked LTR")
@@ -307,8 +304,11 @@ public_exercise_sections = {exercise.get("section") for exercise in exercises}
 public_exercise_numbers = {exercise.get("number") for exercise in exercises}
 if {"2.3", "3.4"} & public_section_ids:
     errors.append("Unplanned review sections 2.3 or 3.4 are still present")
-if "3.3" not in public_section_ids:
-    errors.append("Planned image-processing section 3.3 is missing")
+if "3.3" in public_section_ids:
+    errors.append("Empty image-processing section 3.3 is still public")
+empty_public_sections = sorted(public_section_ids - public_exercise_sections)
+if empty_public_sections:
+    errors.append("Public sections without questions: " + ", ".join(empty_public_sections))
 if (
     unpublished_section in public_section_ids
     or unpublished_section in public_exercise_sections
@@ -339,6 +339,9 @@ else:
     for needle in ["renderExerciseBody", "exercise-part", "solutionHtml", "chapterTitle.textContent", '<h4 class="exercise-title">']:
         if needle not in app_html:
             errors.append(f"app.js is missing progressive-part support: {needle}")
+    for forbidden in ["ממומש", "חלקי", "בעבודה", "comingSoon", "implementedSections"]:
+        if forbidden in app_html:
+            errors.append(f"app.js still contains an unfinished-status marker: {forbidden}")
 
 css = root / "assets" / "styles.css"
 if not css.exists():
