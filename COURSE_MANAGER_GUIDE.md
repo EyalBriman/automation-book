@@ -1,4 +1,4 @@
-# Course Manager Guide: Editing, Adding, Deleting, and Mixed Changes
+# Course Manager Guide: Updating the Exercise Book
 
 This guide is for a course manager who is not a programmer.
 
@@ -6,18 +6,10 @@ The short version is: **make the change in Word, rebuild the website, inspect
 the result, and only then publish the generated public files.** Replacing or
 uploading the Word file alone does not update the website.
 
-The Windows helper supports four modes:
-
-1. Edit an existing question.
-2. Add a new question.
-3. Delete a question from the public website by turning its Word heading into
-   an empty draft.
-4. Process mixed changes when one Word version contains any combination of
-   edits, additions, and deletions.
-
-The helper does not edit Word for you. It reads the Word file, builds a safe
-temporary copy of the website, reports which questions changed, validates the
-result, and replaces `docs/` only if validation succeeds.
+There is one Windows workflow for every type of change. The helper does not
+edit Word for you. It reads the Word file, rebuilds the complete website in a
+safe temporary folder, reports which question numbers appear to have changed,
+validates the result, and replaces `docs/` only if validation succeeds.
 
 ## Before every change
 
@@ -29,9 +21,43 @@ result, and replaces `docs/` only if validation succeeds.
 
 The default source location is:
 
-`private-source/Automation_book4Aug2026.docx`
+`private-source/Automation_book_current.docx`
 
 If the DOCX is stored elsewhere, drag it onto `BUILD_SITE_WINDOWS.bat`.
+
+## Included first-run test for question 2.2.5
+
+This handoff ZIP deliberately contains two different states:
+
+- `docs/` is the 77-question starting website.
+- `private-source/Automation_book_current.docx` is the current Word source and
+  already contains question 2.2.5.
+
+This difference is intentional: it tests whether the Windows helper really
+converts the current Word file and updates the website.
+
+1. Extract the ZIP into a new folder.
+2. Double-click `BUILD_SITE_WINDOWS.bat`.
+3. Wait for the complete rebuild.
+4. The change summary should report:
+
+   ```text
+   Before: 77 public questions
+   After:  78 public questions
+   Added public numbers:   2.2.5
+   Removed public numbers: none
+   Changed public numbers: 1.2.2, 1.2.3, 1.2.4, 1.3.2, 1.3.3, 1.3.4
+   ```
+
+5. Wait for `BUILD AND VALIDATION SUCCEEDED`.
+6. Inspect 2.2.5 in the website that opens and confirm that both the question
+   and its solution use the complete Hebrew sequence א–ד. The condition lines
+   inside answer א must be bullets and must not restart א, ב, ג.
+
+Do not run the Bash publishing command before this test succeeds. Before the
+BAT runs, `docs/` is only the 77-question test baseline. After the successful
+BAT run, the same local folder contains the validated 78-question website and
+is ready to publish.
 
 ## Editing an existing question
 
@@ -42,7 +68,7 @@ If the DOCX is stored elsewhere, drag it onto `BUILD_SITE_WINDOWS.bat`.
 5. Keep `פתרון` or `פתרון:` in its own separate paragraph.
 6. Edit the solution, images, and tables as needed.
 7. Save and close Microsoft Word.
-8. Run `BUILD_SITE_WINDOWS.bat` and choose **E** for Edit.
+8. Run `BUILD_SITE_WINDOWS.bat`.
 9. Confirm that the change summary lists the expected changed number and does
    not show an unexpected addition, removal, or renumbering warning.
 10. Inspect the changed question, its solution, and the questions immediately
@@ -51,6 +77,28 @@ If the DOCX is stored elsewhere, drag it onto `BUILD_SITE_WINDOWS.bat`.
 Do not type or change the public question number as ordinary text. For normal
 questions, the importer reads the Word list structure and calculates the public
 number.
+
+## Questions with subparts
+
+Use one Word numbering system for the question parts: either Hebrew
+`א, ב, ג, ...` or numeric `1, 2, 3, ...`. Apply real Word list numbering to all
+question parts. This question list is authoritative: the importer uses its
+scheme and its number of items for the solution. Do not use Latin `A, B, C`.
+
+Both solution arrangements are supported:
+
+1. **Answer after each subpart:** put the subpart content, then a separate
+   `פתרון` paragraph and that subpart's answer. Repeat for every subpart. The
+   website labels the parts according to the Word list: `א, ב, ג` or `1, 2, 3`.
+2. **All answers at the end:** put one separate `פתרון` paragraph after all
+   subparts. Separate the answers with sequential headings. The importer makes
+   those headings match the question's Word list, including its Hebrew or
+   numeric scheme and its exact number of parts. Use ordinary bullets for
+   supporting lists inside an answer so they are not mistaken for new parts.
+
+The validator stops publication if it cannot match the answers to the number
+of Word question parts, or if it finds generated Latin labels, a mixed label
+system, a late starting label, or a skipped label.
 
 ## Adding a new question
 
@@ -70,7 +118,7 @@ question-specific diagrams.
 5. Keep a separate paragraph containing exactly `פתרון` or `פתרון:`.
 6. Replace the solution content.
 7. Save and close Word.
-8. Run `BUILD_SITE_WINDOWS.bat` and choose **A** for Add.
+8. Run `BUILD_SITE_WINDOWS.bat`.
 9. Confirm that the change summary lists the new public question number.
 
 The public number is generated from the question's position. For example, the
@@ -89,7 +137,8 @@ appear on the public website.
 
 Copy a complete exam or part using the same Word structure. Each new part
 should be a numbered Word-list paragraph followed by a separate `פתרון`
-paragraph. The website assigns the Hebrew part labels automatically.
+paragraph. The website assigns Hebrew or numeric part labels automatically,
+according to the list format used in Word.
 
 Several existing exams contain historical formatting exceptions that the
 importer already recognizes. New questions should use the regular structure
@@ -112,7 +161,7 @@ Instead, turn the question into an empty draft:
 5. Delete the separate `פתרון` or `פתרון:` paragraph.
 6. Delete the solution text, images, and tables belonging to that question.
 7. Save and close Word.
-8. Run `BUILD_SITE_WINDOWS.bat` and choose **D** for Delete.
+8. Run `BUILD_SITE_WINDOWS.bat`.
 9. In the change summary, confirm that the number appears under
    `Removed public numbers` and under `Draft headings`.
 10. In the opened website, confirm that the question is absent and that the
@@ -164,7 +213,10 @@ Install:
 1. Python 3. During installation, select **Add Python to PATH**.
 2. Pandoc.
 3. LibreOffice Writer.
-4. GitHub Desktop if a graphical Git workflow is preferred.
+4. Git for Windows, which includes Git Bash.
+
+GitHub Desktop is optional if a graphical Git workflow is preferred, but the
+publishing command below is run in Git Bash.
 
 Restart Windows after installation.
 
@@ -173,15 +225,17 @@ Restart Windows after installation.
 1. Close Microsoft Word.
 2. Double-click `BUILD_SITE_WINDOWS.bat` to use the bundled source, or drag a
    newer DOCX file onto it.
-3. Choose **E** for edits only, **A** for additions only, **D** for deletions
-   only, or **M** when the Word file contains more than one type of change.
-4. If deleting, read the safe-deletion reminder and continue.
-5. Read the `QUESTION CHANGE SUMMARY` in the command window.
-6. Wait for `BUILD AND VALIDATION SUCCEEDED`.
-7. Inspect the website opened by the helper.
+3. Wait while the helper rebuilds the complete website.
+4. Read the informational `QUESTION CHANGE SUMMARY` in the command window.
+5. Wait for `BUILD AND VALIDATION SUCCEEDED`.
+6. Inspect the website opened by the helper.
 
 The helper builds in a temporary folder first. If conversion or validation
 fails, the existing `docs/` website is not replaced.
+
+The change summary compares normalized visible wording and is informational; it
+does not block a valid build. The validator and browser inspection are the
+authoritative checks for images, tables, Word-list numbering, and subparts.
 
 If an error appears, do not publish. Copy the complete error message and send
 it to the technical maintainer.
@@ -200,15 +254,14 @@ To build from another Word file:
 bash BUILD_SITE.sh "/full/path/to/new-version.docx"
 ```
 
-The Windows operation menu and change summary are provided by the BAT workflow.
-On macOS or Linux, manually inspect the generated question list after building.
+The Windows change summary is provided by the BAT workflow. On macOS or Linux,
+manually inspect the generated question list after building.
 
 ## Inspection checklist
 
 Before publication, confirm that:
 
-- The change summary matches the intended edit, addition, deletion, or mixed
-  set of changes.
+- The change summary is reasonable for the intended Word update.
 - No unexpected renumbering warning appears. If it does, inspect every shifted
   question and contact the technical maintainer before publishing.
 - The question number and title are correct.
@@ -222,18 +275,26 @@ Before publication, confirm that:
 
 ## Publishing
 
-The included Bash helper can build, validate, and publish:
+The included Bash helper can build, validate, and publish. The repository URL
+must always be stated explicitly:
 
 ```bash
-bash PUBLISH_TO_GITHUB.sh
+REPO_URL="https://github.com/CURRENT_OWNER/automation-book.git" \
+  bash PUBLISH_TO_GITHUB.sh
 ```
 
 On Windows, first complete the BAT build and inspect the preview. Then open Git
 Bash in the project folder and upload the already-generated site with:
 
 ```bash
-SKIP_BUILD=1 bash PUBLISH_TO_GITHUB.sh
+REPO_URL="https://github.com/CURRENT_OWNER/automation-book.git" \
+  SKIP_BUILD=1 \
+  COMMIT_MESSAGE="Fix Windows build and add question 2.2.5" \
+  bash PUBLISH_TO_GITHUB.sh
 ```
+
+Use `EyalBriman` as `CURRENT_OWNER` while the repository is still under Eyal,
+or `Bermansi` after the transfer is complete.
 
 This prebuilt upload mode does not require Python, Pandoc, or LibreOffice. It
 checks that the essential generated website files exist and then uploads the
@@ -251,7 +312,7 @@ upload a ZIP through the GitHub website.
 1. Keep a backup of the new DOCX file.
 2. Confirm that edits, additions, and deletions follow the structures described
    above.
-3. Replace `private-source/Automation_book4Aug2026.docx`, or drag the new file
+3. Replace `private-source/Automation_book_current.docx`, or drag the new file
    onto the Windows helper.
 4. Build and validate the website.
 5. Read the change summary and inspect all affected questions and section

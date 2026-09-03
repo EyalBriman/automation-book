@@ -1168,25 +1168,6 @@ def rasterize_image_processing_matrices(exercises: List[dict], docs_dir: Path) -
             exercise[field] = str(soup).strip()
 
 
-def distinguish_controller_subanswers(exercises: List[dict]) -> None:
-    """Use Latin letters for answer subparts while questions retain 1,2,3."""
-    for exercise in exercises:
-        if exercise.get("section") != "2.2":
-            continue
-        soup = BeautifulSoup(exercise.get("solutionHtml", ""), "html.parser")
-        next_letter = 1
-        for ordered_list in soup.find_all("ol", recursive=False):
-            ordered_list["type"] = "A"
-            ordered_list["start"] = str(next_letter)
-            classes = set(ordered_list.get("class", []))
-            classes.add("controller-subanswers")
-            ordered_list["class"] = sorted(classes)
-            next_letter += len(ordered_list.find_all("li", recursive=False))
-        exercise["solutionHtml"] = str(soup).strip()
-
-
-
-
 def attach_word_visuals(
     solution_html: str,
     keys: Sequence[str],
@@ -1350,7 +1331,6 @@ def build_data(
             "solutionHtml": solution_html,
         })
 
-    distinguish_controller_subanswers(exercises)
     rasterize_image_processing_matrices(exercises, docs_dir)
     stabilize_all_exercise_images(exercises, docs_dir)
 

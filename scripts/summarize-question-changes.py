@@ -8,6 +8,7 @@ import hashlib
 import html
 import json
 import re
+import unicodedata
 from pathlib import Path
 
 
@@ -19,6 +20,8 @@ def load_book(path: Path) -> dict:
 def text_only(value: str) -> str:
     value = re.sub(r"<[^>]+>", " ", value)
     value = html.unescape(value)
+    value = unicodedata.normalize("NFKC", value)
+    value = re.sub(r"[\u200e\u200f\u202a-\u202e\u2066-\u2069]", "", value)
     return re.sub(r"\s+", " ", value).strip()
 
 
@@ -29,12 +32,20 @@ def question_fingerprint(exercise: dict) -> str:
     return hashlib.sha256("\n".join(pieces).encode("utf-8")).hexdigest()
 
 
-def full_fingerprint(exercise: dict) -> str:
+def visible_content_fingerprint(exercise: dict) -> str:
+    """Compare visible wording, not platform-dependent generated HTML."""
     comparable = {
-        "title": exercise.get("title"),
-        "questionHtml": exercise.get("questionHtml"),
-        "solutionHtml": exercise.get("solutionHtml"),
-        "parts": exercise.get("parts", []),
+        "title": text_only(str(exercise.get("title", ""))),
+        "question": text_only(exercise.get("questionHtml", "")),
+        "solution": text_only(exercise.get("solutionHtml", "")),
+        "parts": [
+            {
+                "label": str(part.get("label", "")),
+                "question": text_only(part.get("questionHtml", "")),
+                "solution": text_only(part.get("solutionHtml", "")),
+            }
+            for part in exercise.get("parts", [])
+        ],
     }
     payload = json.dumps(comparable, ensure_ascii=False, sort_keys=True)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
@@ -47,7 +58,6 @@ def format_numbers(values: list[str]) -> str:
 parser = argparse.ArgumentParser()
 parser.add_argument("--before", type=Path, required=True)
 parser.add_argument("--after", type=Path, required=True)
-parser.add_argument("--operation", choices=["edit", "add", "delete", "mixed"], required=True)
 args = parser.parse_args()
 
 before = load_book(args.before)
@@ -60,7 +70,7 @@ removed = sorted(set(old) - set(new))
 changed = sorted(
     number
     for number in set(old) & set(new)
-    if full_fingerprint(old[number]) != full_fingerprint(new[number])
+    if visible_content_fingerprint(old[number]) != visible_content_fingerprint(new[number])
 )
 
 old_by_question = {question_fingerprint(item): number for number, item in old.items()}
@@ -89,28 +99,4 @@ if moved:
         print(f" - {old_number} may have moved to {new_number}")
     print("Inspect every shifted question, title, solution, and image before publishing.")
 
-operation_mismatch = False
-if args.operation == "edit":
-    if added or removed:
-        operation_mismatch = True
-        print("ERROR: You selected EDIT ONLY, but public question numbers were added or removed.")
-elif args.operation == "add":
-    if not added:
-        operation_mismatch = True
-        print("ERROR: You selected ADD ONLY, but no new public question number was detected.")
-    elif removed or changed:
-        operation_mismatch = True
-        print("ERROR: You selected ADD ONLY, but edits or deletions were also detected.")
-elif args.operation == "delete":
-    if not removed:
-        operation_mismatch = True
-        print("ERROR: You selected DELETE ONLY, but no public question number was removed.")
-    elif added or changed:
-        operation_mismatch = True
-        print("ERROR: You selected DELETE ONLY, but additions or edits were also detected.")
-# Mixed mode intentionally accepts any combination. The detailed summary above
-# remains the review gate and the full site validator still runs afterwards.
-
-if operation_mismatch:
-    print("The staged build was stopped so the existing docs folder stays unchanged.")
-    raise SystemExit(2)
+print("The summary is informational. The validated build continues regardless of change type.")

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORD_FILE="${1:-$PROJECT_DIR/private-source/Automation_book4Aug2026.docx}"
+WORD_FILE="${1:-$PROJECT_DIR/private-source/Automation_book_current.docx}"
 
 for command_name in python3 pandoc; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
@@ -28,4 +28,3 @@ python3 scripts/validate-book.py --docs docs
 
 echo "BUILD AND VALIDATION SUCCEEDED"
 echo "Preview: $PROJECT_DIR/docs/index.html"
-

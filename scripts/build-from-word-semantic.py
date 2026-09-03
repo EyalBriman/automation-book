@@ -59,6 +59,7 @@ CHAPTER4_QUESTION_RE = re.compile(r"^(\d+)\)\s+(.+)$")
 CHAPTER5_EXAM_RE = re.compile(r"^5\.\d+\s+(.+)$")
 CONTROLLER_TEXT_QUESTION_RE = re.compile(r"^\d+\)\s*")
 MARKER_RE = re.compile(r"\[\[AB(?:CHAPTER|SECTION|QUESTION|PART|SOLUTION):[^\]]+\]\]")
+LIST_FORMAT_MARKER = "[[ABLISTFMT:hebrew]]"
 
 EXCLUDED_PUBLIC_SECTIONS = {"4.8"}
 
@@ -140,6 +141,9 @@ class QuestionRecord:
     solution_index: Optional[int] = None
     solution_marker: Optional[str] = None
     parts: List[PartRecord] = field(default_factory=list)
+    part_label_scheme: Optional[str] = None
+    part_labels: List[str] = field(default_factory=list)
+    solution_part_layout: Optional[str] = None
     draft: bool = False
 
 
@@ -195,6 +199,70 @@ def add_prefix(paragraph: etree._Element, marker: str) -> None:
     text_node.text = marker + (text_node.text or "")
 
 
+def add_list_format_marker(paragraph: etree._Element) -> None:
+    """Mark a Hebrew Word list without changing its numbering properties."""
+    text_node = paragraph.find(".//w:t", NS)
+    if text_node is None:
+        return
+    text_node.set(f"{{{XML}}}space", "preserve")
+    text_node.text = LIST_FORMAT_MARKER + (text_node.text or "")
+
+
+def word_numbering_formats(archive: zipfile.ZipFile) -> Dict[Tuple[str, int], str]:
+    """Return Word numbering formats keyed by (numId, level)."""
+    numbering = etree.fromstring(archive.read("word/numbering.xml"))
+    num_to_abstract = {
+        node.get(qn("numId")): node.find("w:abstractNumId", NS).get(qn("val"))
+        for node in numbering.findall("w:num", NS)
+        if node.get(qn("numId")) is not None
+        and node.find("w:abstractNumId", NS) is not None
+    }
+    formats: Dict[Tuple[str, int], str] = {}
+    for abstract in numbering.findall("w:abstractNum", NS):
+        abstract_id = abstract.get(qn("abstractNumId"))
+        if abstract_id is None:
+            continue
+        for level in abstract.findall("w:lvl", NS):
+            level_value = level.get(qn("ilvl"))
+            format_node = level.find("w:numFmt", NS)
+            if level_value is None or format_node is None:
+                continue
+            for num_id, mapped_abstract in num_to_abstract.items():
+                if mapped_abstract == abstract_id:
+                    formats[(num_id, int(level_value))] = format_node.get(qn("val"), "")
+    return formats
+
+
+def label_scheme(number_format: Optional[str]) -> Optional[str]:
+    if number_format == "hebrew1":
+        return "hebrew"
+    if number_format in {"decimal", "decimalZero"}:
+        return "numeric"
+    return None
+
+
+def sequential_labels(scheme: str, count: int) -> List[str]:
+    if scheme == "hebrew":
+        return [chr(ord("א") + index) for index in range(count)]
+    if scheme == "numeric":
+        return [str(index) for index in range(1, count + 1)]
+    raise ValueError(f"Unsupported part-label scheme: {scheme}")
+
+
+def source_part_label(
+    record: ParagraphRecord,
+    ordinal: int,
+    numbering_formats: Dict[Tuple[str, int], str],
+) -> str:
+    scheme = label_scheme(numbering_formats.get((record.num_id, record.level)))
+    if scheme is None:
+        raise SystemExit(
+            "Question parts must use either Hebrew letters or decimal numbers in Word; "
+            f"could not read the format of: {record.text[:80]}"
+        )
+    return sequential_labels(scheme, ordinal)[-1]
+
+
 def short_title(text: str, limit: int = 92) -> str:
     text = re.sub(r"^\d+(?:\.\d+)*(?:[א-ת])?[.)]?\s*", "", text).strip()
     if len(text) <= limit:
@@ -221,6 +289,17 @@ def established_titles() -> Tuple[Dict[str, str], Dict[Tuple[str, str], str], Di
 TITLE_OVERRIDES, PART_TITLE_OVERRIDES, SECTION_TITLE_OVERRIDES = established_titles()
 
 
+def source_part_title(question_id: str, label: str, ordinal: int, text: str) -> str:
+    # Historical title/visual overrides were keyed by Hebrew labels.  Falling
+    # back by position keeps them attached if a manager changes the Word list
+    # for the same question from Hebrew letters to decimal numbers.
+    hebrew_position = chr(ord("א") + ordinal - 1)
+    return PART_TITLE_OVERRIDES.get(
+        (question_id, label),
+        PART_TITLE_OVERRIDES.get((question_id, hebrew_position), short_title(text, 74)),
+    )
+
+
 def solution_marker(text: str) -> bool:
     return legacy.is_solution_marker(text)
 
@@ -240,8 +319,106 @@ def find_part_question(
     return None
 
 
+def explicit_part_labels(records: Sequence[ParagraphRecord]) -> Tuple[Optional[str], List[str]]:
+    """Read answer headings typed directly in Word, such as א. or 1."""
+    hebrew: List[str] = []
+    numeric: List[str] = []
+    for record in records:
+        text = re.sub(r"[\u200e\u200f\u202a-\u202e\u2066-\u2069]", "", record.text).strip()
+        match = re.match(r"^([א-ת]|\d+)[.)]\s*", text)
+        if not match:
+            continue
+        label = match.group(1)
+        if label.isdigit():
+            numeric.append(label)
+        else:
+            hebrew.append(label)
+    if hebrew and numeric:
+        return "mixed", hebrew + numeric
+    if hebrew:
+        return "hebrew", hebrew
+    if numeric:
+        return "numeric", numeric
+    return None, []
+
+
+def configure_single_solution_parts(
+    question: QuestionRecord,
+    records: Sequence[ParagraphRecord],
+    solution_index: int,
+    end_index: int,
+    numbering_formats: Dict[Tuple[str, int], str],
+) -> None:
+    """Discover a part list whose answers are collected in one solution block.
+
+    The question's Word list determines both the label scheme and the number of
+    parts.  Answers may be headed by explicit text (``א.``, ``1.``) or by a
+    second Word list.  This metadata lets the HTML stage correct explicit
+    labels without confusing lists inside an answer with new question parts.
+    """
+
+    question_groups: Dict[Tuple[str, int], List[ParagraphRecord]] = defaultdict(list)
+    for record in records[question.paragraph_index + 1 : solution_index]:
+        if record.num_id is None or record.level != 0:
+            continue
+        scheme = label_scheme(numbering_formats.get((record.num_id, record.level)))
+        if scheme is not None:
+            question_groups[(record.num_id, record.level)].append(record)
+
+    candidates = [items for items in question_groups.values() if len(items) >= 2]
+    if not candidates:
+        return
+
+    # Include the solution marker itself: some Word questions begin their
+    # collected solution with a heading such as "א. פתרון ...", which is both
+    # the first answer label and the semantic solution boundary.
+    answer_records = records[solution_index:end_index]
+    explicit_scheme, explicit_labels = explicit_part_labels(answer_records)
+
+    answer_groups: Dict[Tuple[str, int], List[ParagraphRecord]] = defaultdict(list)
+    for record in answer_records:
+        if record.num_id is None or record.level != 0:
+            continue
+        scheme = label_scheme(numbering_formats.get((record.num_id, record.level)))
+        if scheme is not None:
+            answer_groups[(record.num_id, record.level)].append(record)
+
+    # The real part list is normally the last repeated level-zero list before
+    # the solution.  Require a complete answer mapping before recording it.
+    for question_items in sorted(candidates, key=lambda items: items[-1].paragraph_index, reverse=True):
+        count = len(question_items)
+        scheme = label_scheme(
+            numbering_formats.get((question_items[0].num_id, question_items[0].level))
+        )
+        if scheme is None:
+            continue
+
+        if explicit_scheme in {"hebrew", "numeric"}:
+            if explicit_labels == sequential_labels(explicit_scheme, count):
+                question.part_label_scheme = scheme
+                question.part_labels = sequential_labels(scheme, count)
+                question.solution_part_layout = "explicit"
+                return
+
+        matching_answer_lists = []
+        for answer_items in answer_groups.values():
+            if len(answer_items) != count:
+                continue
+            answer_scheme = label_scheme(
+                numbering_formats.get((answer_items[0].num_id, answer_items[0].level))
+            )
+            if answer_scheme == scheme:
+                matching_answer_lists.append(answer_items)
+        if matching_answer_lists:
+            question.part_label_scheme = scheme
+            question.part_labels = sequential_labels(scheme, count)
+            question.solution_part_layout = "word-list"
+            return
+
+
 def semantic_structure(source: Path, marked_output: Path) -> Structure:
     with zipfile.ZipFile(source, "r") as archive:
+        numbering_formats = word_numbering_formats(archive)
         root = etree.fromstring(archive.read("word/document.xml"))
         body = root.find(qn("body"))
         if body is None:
@@ -465,7 +642,7 @@ def semantic_structure(source: Path, marked_output: Path) -> Structure:
                         None,
                     )
                     solution = explicit_solution or records[candidate.paragraph_index + 1]
-                    label = chr(ord("א") + index)
+                    label = source_part_label(candidate, index + 1, numbering_formats)
                     part_marker = f"[[ABPART:{question.id}:{label}]]"
                     solution_token = f"[[ABSOLUTION:{question.id}:{label}]]"
                     add_prefix(candidate.element, part_marker)
@@ -473,7 +650,7 @@ def semantic_structure(source: Path, marked_output: Path) -> Structure:
                     question.parts.append(
                         PartRecord(
                             label,
-                            PART_TITLE_OVERRIDES.get((question.id, label), short_title(candidate.text, 74)),
+                            source_part_title(question.id, label, index + 1, candidate.text),
                             candidate.paragraph_index,
                             solution.paragraph_index,
                             part_marker,
@@ -518,6 +695,13 @@ def semantic_structure(source: Path, marked_output: Path) -> Structure:
                 question.solution_index = solution.paragraph_index
                 question.solution_marker = marker
                 add_prefix(solution.element, marker)
+                configure_single_solution_parts(
+                    question,
+                    records,
+                    solution.paragraph_index,
+                    end_index,
+                    numbering_formats,
+                )
                 continue
 
             previous_solution = question.paragraph_index
@@ -529,7 +713,7 @@ def semantic_structure(source: Path, marked_output: Path) -> Structure:
                         f"Could not identify the question text before solution {part_number} of {question.id}"
                     )
                 used_candidates.add(candidate.paragraph_index)
-                label = chr(ord("א") + part_number - 1)
+                label = source_part_label(candidate, part_number, numbering_formats)
                 part_marker = f"[[ABPART:{question.id}:{label}]]"
                 solution_token = f"[[ABSOLUTION:{question.id}:{label}]]"
                 add_prefix(candidate.element, part_marker)
@@ -537,7 +721,7 @@ def semantic_structure(source: Path, marked_output: Path) -> Structure:
                 question.parts.append(
                     PartRecord(
                         label,
-                        PART_TITLE_OVERRIDES.get((question.id, label), short_title(candidate.text, 74)),
+                        source_part_title(question.id, label, part_number, candidate.text),
                         candidate.paragraph_index,
                         solution.paragraph_index,
                         part_marker,
@@ -545,6 +729,19 @@ def semantic_structure(source: Path, marked_output: Path) -> Structure:
                     )
                 )
                 previous_solution = solution.paragraph_index
+
+        # Pandoc preserves decimal and Latin list formats in HTML, but it drops
+        # Word's Hebrew numbering format. Add a temporary marker to list items
+        # that still have their numbering properties so the HTML postprocessor
+        # can restore א, ב, ג... exactly as written in Word.
+        for record in records:
+            if record.num_id is None or record.level is None:
+                continue
+            properties = record.element.find("w:pPr", NS)
+            if properties is None or properties.find("w:numPr", NS) is None:
+                continue
+            if numbering_formats.get((record.num_id, record.level)) == "hebrew1":
+                add_list_format_marker(record.element)
 
         replacement = etree.tostring(root, xml_declaration=True, encoding="UTF-8", standalone="yes")
         marked_output.parent.mkdir(parents=True, exist_ok=True)
@@ -671,16 +868,19 @@ def build_exercises(
             )
             if not question_html.strip() or not solution_html.strip():
                 raise SystemExit(f"Empty question or solution after semantic import: {question.id}")
-            exercises.append(
-                {
-                    "id": legacy.exercise_id(question.id),
-                    "number": question.id,
-                    "section": question.section,
-                    "title": question.title,
-                    "questionHtml": question_html,
-                    "solutionHtml": solution_html,
-                }
-            )
+            exercise = {
+                "id": legacy.exercise_id(question.id),
+                "number": question.id,
+                "section": question.section,
+                "title": question.title,
+                "questionHtml": question_html,
+                "solutionHtml": solution_html,
+            }
+            if question.part_labels:
+                exercise["partLabelScheme"] = question.part_label_scheme
+                exercise["partLabels"] = question.part_labels
+                exercise["solutionPartLayout"] = question.solution_part_layout
+            exercises.append(exercise)
             continue
 
         first_part_point = marker_point(children, question.parts[0].marker)
@@ -706,9 +906,12 @@ def build_exercises(
                 clean_marker_paragraph(solution_point.paragraph, solution=True),
                 children[solution_point.block_index + 1 : next_part_block],
             )
+            visual_keys = PART_VISUALS.get((question.id, part.label))
+            if visual_keys is None:
+                visual_keys = PART_VISUALS.get((question.id, chr(ord("א") + index)), ())
             part_solution_html = legacy.attach_word_visuals(
                 part_solution_html,
-                PART_VISUALS.get((question.id, part.label), ()),
+                visual_keys,
                 visuals,
             )
             if not part_question_html.strip() or not part_solution_html.strip():
@@ -732,8 +935,98 @@ def build_exercises(
             }
         )
 
-    legacy.distinguish_controller_subanswers(exercises)
     return exercises
+
+
+def preserve_word_list_formats(soup: BeautifulSoup) -> None:
+    """Restore Hebrew list markers that Pandoc cannot express by itself."""
+    for node in list(soup.find_all(string=lambda value: isinstance(value, str) and LIST_FORMAT_MARKER in value)):
+        parent_list = node.find_parent("ol")
+        if parent_list is not None:
+            classes = set(parent_list.get("class", []))
+            classes.add("word-list-hebrew")
+            parent_list["class"] = sorted(classes)
+            parent_list.attrs.pop("type", None)
+        cleaned = str(node).replace(LIST_FORMAT_MARKER, "")
+        if cleaned:
+            node.replace_with(NavigableString(cleaned))
+        else:
+            node.extract()
+
+    if LIST_FORMAT_MARKER in soup.get_text(" "):
+        raise SystemExit("Could not remove all temporary Word list-format markers")
+
+
+def normalize_explicit_solution_labels(
+    solution_html: str,
+    expected_scheme: Optional[str],
+    expected_labels: Sequence[str],
+    solution_layout: Optional[str],
+) -> str:
+    """Make collected answer labels follow the question's Word list.
+
+    For an all-answers-at-the-end layout, the question list is authoritative.
+    Explicit answer headings are rewritten from Hebrew to decimal or vice
+    versa when necessary.  Ordered lists inside those explicit answers are
+    supporting content rather than another set of parts, so lists using the
+    same label scheme are displayed as bullets.
+    """
+
+    if solution_layout != "explicit" or expected_scheme is None or len(expected_labels) < 2:
+        return solution_html
+
+    solution_soup = BeautifulSoup(solution_html, "html.parser")
+    labelled_nodes: List[Tuple[NavigableString, str]] = []
+    for paragraph in solution_soup.find_all("p"):
+        if paragraph.find_parent(["li", "table"]):
+            continue
+        for node in paragraph.find_all(string=True):
+            original = str(node)
+            match = re.match(
+                r"^(\s*[\u200e\u200f\u202a-\u202e\u2066-\u2069]*)([א-ת]|\d+)([.)])",
+                original,
+            )
+            if match:
+                labelled_nodes.append((node, match.group(2)))
+                break
+
+    found_labels = [label for _, label in labelled_nodes]
+    found_scheme = None
+    if found_labels and all(label.isdigit() for label in found_labels):
+        found_scheme = "numeric"
+    elif found_labels and all(not label.isdigit() for label in found_labels):
+        found_scheme = "hebrew"
+
+    if found_scheme is None or found_labels != sequential_labels(found_scheme, len(expected_labels)):
+        raise SystemExit(
+            "Could not match the collected solution headings to the question parts. "
+            f"Expected {len(expected_labels)} sequential headings; found {found_labels}."
+        )
+
+    for (node, _), replacement in zip(labelled_nodes, expected_labels):
+        original = str(node)
+        updated = re.sub(
+            r"^(\s*[\u200e\u200f\u202a-\u202e\u2066-\u2069]*)([א-ת]|\d+)([.)])",
+            lambda match: match.group(1) + replacement + match.group(3),
+            original,
+            count=1,
+        )
+        node.replace_with(NavigableString(updated))
+
+    for ordered in solution_soup.find_all("ol"):
+        scheme = "hebrew" if "word-list-hebrew" in ordered.get("class", []) else "numeric"
+        if scheme != expected_scheme:
+            continue
+        ordered.name = "ul"
+        classes = [name for name in ordered.get("class", []) if name != "word-list-hebrew"]
+        if classes:
+            ordered["class"] = classes
+        else:
+            ordered.attrs.pop("class", None)
+        ordered.attrs.pop("start", None)
+        ordered.attrs.pop("type", None)
+
+    return str(solution_soup).strip()
 
 
 def postprocess_exercise_html(exercises: List[dict]) -> None:
@@ -752,6 +1045,13 @@ def postprocess_exercise_html(exercises: List[dict]) -> None:
         for field_name in ("questionHtml", "solutionHtml"):
             if field_name in exercise:
                 exercise[field_name] = process(exercise[field_name])
+        if "questionHtml" in exercise and "solutionHtml" in exercise:
+            exercise["solutionHtml"] = normalize_explicit_solution_labels(
+                exercise["solutionHtml"],
+                exercise.get("partLabelScheme"),
+                exercise.get("partLabels", ()),
+                exercise.get("solutionPartLayout"),
+            )
         for part in exercise.get("parts", []):
             for field_name in ("questionHtml", "solutionHtml"):
                 if field_name in part:
@@ -768,6 +1068,7 @@ def build_data(
 ) -> dict:
     raw_html = legacy.clean_raw_pandoc_html(html_path.read_text(encoding="utf-8"))
     soup = BeautifulSoup(raw_html, "html.parser")
+    preserve_word_list_formats(soup)
     legacy.normalize_media(temp_dir, docs_dir, soup)
     body = soup.body or soup
     children = [child for child in body.children if isinstance(child, Tag)]
@@ -818,8 +1119,11 @@ def main() -> None:
             temp_dir,
             args.out,
         )
-    legacy.prune_unused_media(data, args.out)
     legacy.write_book_data(data, args.out)
+    # Pruning is deliberately the final filesystem operation. Pandoc extracts
+    # every image embedded in Word, while only the images referenced by public
+    # book data may remain in docs/media.
+    legacy.prune_unused_media(data, args.out)
     print(
         f"Built {len(data['exercises'])} public questions from {args.source}; "
         f"draft headings: {len(data['structure']['draftQuestions'])}."

@@ -460,10 +460,10 @@ table .math.display {
 .matrix-figure img {
   max-height: 30rem;
 }
-.controller-subanswers {
-  list-style-type: upper-alpha;
+.word-list-hebrew {
+  list-style-type: hebrew;
 }
-.controller-subanswers > li::marker {
+.word-list-hebrew > li::marker {
   color: var(--accent-dark);
   font-weight: 700;
 }

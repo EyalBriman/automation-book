@@ -2,10 +2,16 @@
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_URL="${REPO_URL:-https://github.com/EyalBriman/automation-book.git}"
+REPO_URL="${REPO_URL:-}"
 BRANCH="${BRANCH:-main}"
 COMMIT_MESSAGE="${COMMIT_MESSAGE:-Update automation book from Word}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
+
+if [[ -z "$REPO_URL" ]]; then
+  echo "ERROR: Set REPO_URL to the exact GitHub repository URL." >&2
+  echo 'Example: REPO_URL="https://github.com/OWNER/automation-book.git" bash PUBLISH_TO_GITHUB.sh' >&2
+  exit 1
+fi
 
 for command_name in git tar; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
@@ -24,7 +30,7 @@ if [[ "$SKIP_BUILD" == "1" ]]; then
   echo "Using the prebuilt, already-validated website in docs/."
   echo "Python, Pandoc, and LibreOffice are not required for this upload."
 else
-  "$PROJECT_DIR/BUILD_SITE.sh" "${1:-$PROJECT_DIR/private-source/Automation_book4Aug2026.docx}"
+  "$PROJECT_DIR/BUILD_SITE.sh" "${1:-$PROJECT_DIR/private-source/Automation_book_current.docx}"
 fi
 
 UPLOAD_TEMP="$(mktemp -d "${TMPDIR:-/tmp}/automation-book-upload-XXXXXX")"

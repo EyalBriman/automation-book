@@ -22,7 +22,7 @@ cd /d "%PROJECT_DIR%"
 if not "%~1"=="" (
   set "WORD_FILE=%~1"
 ) else (
-  set "WORD_FILE=%PROJECT_DIR%private-source\Automation_book4Aug2026.docx"
+  set "WORD_FILE=%PROJECT_DIR%private-source\Automation_book_current.docx"
 )
 
 if not defined WORD_FILE goto :missing_word
@@ -33,55 +33,26 @@ echo Automation Book build started.
 echo Keep this window open. A full rebuild may take several minutes.
 echo Word source: %WORD_FILE%
 echo.
-echo What did you change in Word?
-echo   [E] Edit existing questions only
-echo   [A] Add questions only
-echo   [D] Delete or unpublish questions only
-echo   [M] Mixed changes: any combination of Edit, Add, and Delete
-choice /C EADM /N /M "Press E, A, D, or M (do not press Enter): "
-if errorlevel 4 (
-  set "CHANGE_TYPE=mixed"
-) else if errorlevel 3 (
-  set "CHANGE_TYPE=delete"
-) else if errorlevel 2 (
-  set "CHANGE_TYPE=add"
-) else (
-  set "CHANGE_TYPE=edit"
-)
+echo The supplied test package currently has 77 public questions.
+echo Its Word source also contains the new question 2.2.5.
+echo The helper will now rebuild the complete website from the Word file.
+echo The change summary is informational and will not block a valid build.
 
-if /I "%CHANGE_TYPE%"=="delete" goto :deletion_reminder
-if /I "%CHANGE_TYPE%"=="mixed" goto :deletion_reminder_done
-goto :deletion_reminder_done
-
-:deletion_reminder
-echo.
-echo Safe deletion reminder:
-echo Keep the styled question heading as an empty draft.
-echo Remove the question text, the separate solution marker, and the solution.
-echo Do not physically remove a middle heading unless a technical maintainer
-echo has checked the resulting renumbering and question-specific figures.
-echo.
-pause
-
-:deletion_reminder_done
-if /I "%CHANGE_TYPE%"=="mixed" (
-  echo.
-  echo Mixed mode selected. The change summary will list every edited, added,
-  echo removed, and possibly renumbered public question.
-  echo If the mixed changes include a deletion, keep the old numbered heading
-  echo as an empty draft so later questions are not renumbered accidentally.
-  echo.
-)
-
-where py >nul 2>&1
-if %errorlevel%==0 (
+set "PYTHON_CMD="
+py -3 --version >nul 2>&1
+if not errorlevel 1 (
   set "PYTHON_CMD=py -3"
 ) else (
-  where python >nul 2>&1
-  if errorlevel 1 goto :missing_python
-  set "PYTHON_CMD=python"
+  python --version >nul 2>&1
+  if not errorlevel 1 set "PYTHON_CMD=python"
 )
+if not defined PYTHON_CMD goto :missing_python
 
+where pandoc >nul 2>&1
+if errorlevel 1 (
+  if exist "%LOCALAPPDATA%\Pandoc\pandoc.exe" set "PATH=%LOCALAPPDATA%\Pandoc;%PATH%"
+  if exist "%ProgramFiles%\Pandoc\pandoc.exe" set "PATH=%ProgramFiles%\Pandoc;%PATH%"
+)
 where pandoc >nul 2>&1
 if errorlevel 1 goto :missing_pandoc
 
@@ -118,8 +89,7 @@ if errorlevel 1 goto :failed
 
 %PYTHON_CMD% scripts\summarize-question-changes.py ^
   --before "%STAGING_ROOT%\before-book-data.js" ^
-  --after "%STAGING_DOCS%\assets\book-data.js" ^
-  --operation "%CHANGE_TYPE%"
+  --after "%STAGING_DOCS%\assets\book-data.js"
 if errorlevel 1 goto :failed
 
 echo.
@@ -145,24 +115,28 @@ exit /b 0
 :missing_word
 echo.
 echo ERROR: The Word file was not found.
-echo Expected: private-source\Automation_book4Aug2026.docx
+echo Expected: private-source\Automation_book_current.docx
 echo Or drag another DOCX file onto BUILD_SITE_WINDOWS.bat.
 goto :failed_end
 
 :missing_python
 echo.
 echo ERROR: Python 3 is not installed or is not available in PATH.
+echo Download: https://www.python.org/downloads/windows/
+echo During installation, select "Add Python to PATH".
 goto :failed_end
 
 :missing_pandoc
 echo.
 echo ERROR: Pandoc is not installed or is not available in PATH.
+echo Download: https://pandoc.org/installing.html
 goto :failed_end
 
 :missing_libreoffice
 echo.
 echo ERROR: LibreOffice was not found.
 echo Install LibreOffice and restart Windows before trying again.
+echo Download: https://www.libreoffice.org/download/download-libreoffice/
 goto :failed_end
 
 :failed
